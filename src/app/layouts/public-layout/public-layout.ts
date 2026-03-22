@@ -8,4 +8,5 @@ import { RouterOutlet, RouterLink } from '@angular/router';
   templateUrl: './public-layout.html',
   styleUrl: './public-layout.css'
 })
+
 export class PublicLayout {}
