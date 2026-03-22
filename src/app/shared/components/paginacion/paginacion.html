@@ -1,0 +1,49 @@
+<div class="flex items-center justify-between px-1 py-2 text-sm text-gray-500">
+
+<!-- Info -->
+    <span>Mostrando {{ inicio }}–{{ fin }} de {{ total }} registros</span>
+
+<!-- Controles -->
+    <div class="flex items-center gap-1">
+
+    <!-- Anterior -->
+        <button
+        (click)="ir(paginaActual - 1)"
+        [disabled]="paginaActual === 1"
+        class="px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50
+                disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </button>
+
+    <!-- Páginas -->
+        @for (p of paginas; track p) {
+            <button
+                (click)="ir(p)"
+                class="w-8 h-8 rounded-lg text-xs font-medium border transition-colors"
+                [class.bg-red-500]="p === paginaActual"
+                [class.text-white]="p === paginaActual"
+                [class.border-red-500]="p === paginaActual"
+                [class.border-gray-200]="p !== paginaActual"
+                [class.hover:bg-gray-50]="p !== paginaActual"
+            >
+                {{ p }}
+            </button>
+        }
+
+    <!-- Siguiente -->
+        <button
+        (click)="ir(paginaActual + 1)"
+        [disabled]="paginaActual === totalPaginas"
+        class="px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50
+                disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </button>
+
+    </div>
+</div>
