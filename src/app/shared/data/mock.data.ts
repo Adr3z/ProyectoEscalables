@@ -1,0 +1,40 @@
+import { Categoria } from '../../models';
+import { Producto }  from '../../models';
+
+// ── Categorías principales ────────────────────────────────────────────────────
+export const CATEGORIAS_PRINCIPALES: Categoria[] = [
+    { _id: 'c1', nombre: 'Pasteles'  },
+    { _id: 'c2', nombre: 'Pays'      },
+    { _id: 'c3', nombre: 'Galletas'  },
+    { _id: 'c4', nombre: 'Gelatinas' },
+];
+
+// ── Subcategorías de Pasteles ─────────────────────────────────────────────────
+export const SUBCATEGORIAS_PASTELES: Categoria[] = [
+    { _id: 's1', nombre: '3 Leches',    padreId: 'c1', padre: { _id: 'c1', nombre: 'Pasteles' } },
+    { _id: 's2', nombre: 'Caseros',     padreId: 'c1', padre: { _id: 'c1', nombre: 'Pasteles' } },
+    { _id: 's3', nombre: 'Chocolate',   padreId: 'c1', padre: { _id: 'c1', nombre: 'Pasteles' } },
+    { _id: 's4', nombre: 'Chicos',      padreId: 'c1', padre: { _id: 'c1', nombre: 'Pasteles' } },
+    { _id: 's5', nombre: 'Individuales',padreId: 'c1', padre: { _id: 'c1', nombre: 'Pasteles' } },
+];
+
+// ── Todas las categorías ──────────────────────────────────────────────────────
+export const TODAS_CATEGORIAS: Categoria[] = [
+    ...CATEGORIAS_PRINCIPALES,
+    ...SUBCATEGORIAS_PASTELES,
+];
+
+// ── Productos mock ────────────────────────────────────────────────────────────
+export const PRODUCTOS_MOCK: Producto[] = [
+    { _id: 'p1',  nombre: 'Pastel 3 Leches Clásico',    descripcion: 'Esponjoso bizcocho bañado en tres leches con crema chantilly.',  precio: 28.00, categoriaId: 's1', categoria: { _id: 's1', nombre: '3 Leches',     padreId: 'c1' }, stockActual: 10 },
+    { _id: 'p2',  nombre: 'Choco-Vanilla Twist',         descripcion: 'Combinación de chocolate oscuro y vainilla con ganache.',         precio: 32.00, categoriaId: 's3', categoria: { _id: 's3', nombre: 'Chocolate',    padreId: 'c1' }, stockActual: 6  },
+    { _id: 'p3',  nombre: 'Pastel Casero de Nuez',       descripcion: 'Receta tradicional con nuez pecana y cajeta.',                   precio: 25.00, categoriaId: 's2', categoria: { _id: 's2', nombre: 'Caseros',      padreId: 'c1' }, stockActual: 4  },
+    { _id: 'p4',  nombre: 'Pastel Chico de Fresa',       descripcion: 'Tamaño personal con fresas frescas y crema pastelera.',          precio: 8.00,  categoriaId: 's4', categoria: { _id: 's4', nombre: 'Chicos',       padreId: 'c1' }, stockActual: 15 },
+    { _id: 'p5',  nombre: 'Individual de Zanahoria',     descripcion: 'Pastelito individual con betún de queso crema.',                 precio: 6.50,  categoriaId: 's5', categoria: { _id: 's5', nombre: 'Individuales', padreId: 'c1' }, stockActual: 20 },
+    { _id: 'p6',  nombre: 'Pay de Limón',                descripcion: 'Base de galleta con relleno cremoso de limón.',                  precio: 18.00, categoriaId: 'c2', categoria: { _id: 'c2', nombre: 'Pays'                          }, stockActual: 8  },
+    { _id: 'p7',  nombre: 'Pay de Manzana',              descripcion: 'Pay tradicional con manzanas caramelizadas y canela.',           precio: 20.00, categoriaId: 'c2', categoria: { _id: 'c2', nombre: 'Pays'                          }, stockActual: 5  },
+    { _id: 'p8',  nombre: 'Galletas de Avena',           descripcion: 'Galletas artesanales con avena, pasas y canela.',                precio: 4.50,  categoriaId: 'c3', categoria: { _id: 'c3', nombre: 'Galletas'                      }, stockActual: 40 },
+    { _id: 'p9',  nombre: 'Galletas de Chispas',         descripcion: 'Clásicas galletas con chispas de chocolate semiamargo.',        precio: 4.00,  categoriaId: 'c3', categoria: { _id: 'c3', nombre: 'Galletas'                      }, stockActual: 35 },
+    { _id: 'p10', nombre: 'Gelatina de Mosaico',         descripcion: 'Colorida gelatina de leche con cubos de gelatina de sabores.',  precio: 5.00,  categoriaId: 'c4', categoria: { _id: 'c4', nombre: 'Gelatinas'                     }, stockActual: 12 },
+    { _id: 'p11', nombre: 'Gelatina de Rompope',         descripcion: 'Suave gelatina cremosa con sabor a rompope.',                   precio: 5.50,  categoriaId: 'c4', categoria: { _id: 'c4', nombre: 'Gelatinas'                     }, stockActual: 0  },
+];
