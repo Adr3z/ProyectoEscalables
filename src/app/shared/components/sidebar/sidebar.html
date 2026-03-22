@@ -1,0 +1,112 @@
+<aside class="w-60 bg-white border-r border-gray-200 flex flex-col h-full shrink-0">
+
+<!-- Logo -->
+    <div class="h-14 flex items-center gap-2.5 px-5 border-b border-gray-200">
+        <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0
+                        2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0
+                        2.704 2.704 0 00-3 0 2.704 2.704 0 01-1.5-.454
+                        M9 6l3-3 3 3M9 6H6a2 2 0 00-2 2v10a2 2 0 002 2h12
+                        a2 2 0 002-2V8a2 2 0 00-2-2h-3M9 6h6"/>
+            </svg>
+        </div>
+
+        <div>
+            <p class="text-sm font-bold text-gray-900 leading-none">BakePOS</p>
+            <p class="text-xs text-gray-400 mt-0.5">Admin Panel</p>
+        </div>
+    </div>
+
+<!-- Nav -->
+    <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+
+        @for (item of navItems; track item.ruta) {
+            <a
+                [routerLink]="item.ruta"
+                routerLinkActive="bg-red-500 text-white hover:bg-red-600"
+                [routerLinkActiveOptions]="{ exact: false }"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                    text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+            >
+            <!-- Icono por nombre -->
+            @switch (item.icono) {
+
+                @case ('dashboard') {
+                    <svg class="w-4.5 h-4.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z
+                        M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z
+                        M4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z
+                        M14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                    </svg>
+                }
+
+                @case ('catalogo') {
+                    <svg class="w-4.5 h-4.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2
+                        m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2
+                        M7 7h10"/>
+                    </svg>
+                }
+
+                @case ('inventario') {
+                    <svg class="w-4.5 h-4.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+                    </svg>
+                }
+
+                @case ('pos') {
+                    <svg class="w-4.5 h-4.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m5-9v9m4-9v9m1-10V4
+                        a1 1 0 00-1-1h-4a1 1 0 00-1 1v3"/>
+                    </svg>
+                }
+
+                @case ('usuarios') {
+                    <svg class="w-4.5 h-4.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857
+                        M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857
+                        m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                }
+
+            }
+
+            {{ item.label }}
+        </a>
+        }
+
+    </nav>
+
+<!-- Footer usuario -->
+    <div class="px-3 py-4 border-t border-gray-200">
+        <div class="flex items-center gap-3 px-3 py-2">
+            <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-xs font-semibold shrink-0">
+                AB
+            </div>
+
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-700 truncate leading-none">Ana Baker</p>
+                <p class="text-xs text-gray-400 mt-0.5 truncate">Admin Central</p>
+            </div>
+        </div>
+
+        <button class="mt-1 w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-500
+                    hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7
+            a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        
+        Cerrar sesión
+        </button>
+    </div>
+
+</aside>
