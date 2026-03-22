@@ -17,4 +17,18 @@ export const routes: Routes = [
         }
         ]
     },
+
+    // Rutas admin
+    {
+        path: 'admin',
+        component: AdminLayout,
+        children: [
+        {
+            path: 'catalogo',
+            loadComponent: () =>
+            import('./modules/catalogo/catalogo-lista/catalogo-lista')
+                .then(m => m.CatalogoLista)
+        },
+        ]
+    },
 ];

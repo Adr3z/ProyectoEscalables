@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 
 export class Paginacion implements OnChanges {
   @Input()  total        = 0;
-  @Input()  porPagina    = 10;
+  @Input()  porPagina    = 5;
   @Input()  paginaActual = 1;
   @Output() paginaCambia = new EventEmitter<number>();
 
