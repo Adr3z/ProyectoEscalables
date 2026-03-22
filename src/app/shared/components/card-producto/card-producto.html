@@ -1,0 +1,35 @@
+<div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer group">
+
+<!-- Imagen placeholder -->
+    <div class="h-44 bg-gray-100 flex items-center justify-center overflow-hidden">
+        <svg class="w-16 h-16 text-gray-300 group-hover:scale-105 transition-transform"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+            d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0
+            2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0
+            2.704 2.704 0 00-3 0 2.704 2.704 0 01-1.5-.454
+            M9 6l3-3 3 3M9 6H6a2 2 0 00-2 2v10a2 2 0 002 2h12
+            a2 2 0 002-2V8a2 2 0 00-2-2h-3M9 6h6"/>
+        </svg>
+    </div>
+
+<!-- Info -->
+    <div class="p-4">
+        <p class="text-xs text-gray-400 mb-1">{{ producto.categoria?.nombre ?? 'Sin categoría' }}</p>
+
+        <h3 class="text-sm font-semibold text-gray-800 truncate">{{ producto.nombre }}</h3>
+
+        @if (producto.descripcion) {
+            <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ producto.descripcion }}</p>
+        }
+
+        <div class="mt-3 flex items-center justify-between">
+            <span class="text-base font-bold text-red-500">
+                ${{ producto.precio | number:'1.2-2' }}
+            </span>
+            
+            <span class="text-xs text-gray-400">{{ producto.stockActual }} uds.</span>
+        </div>
+    </div>
+
+</div>
