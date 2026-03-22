@@ -1,0 +1,112 @@
+<app-modal [titulo]="titulo" [abierto]="abierto" (cerrar)="cerrar.emit()">
+
+    <div class="space-y-4">
+
+        <!-- Nombre -->
+        <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                Nombre del producto
+            </label>
+
+            <input
+                type="text"
+                [(ngModel)]="form.nombre"
+                placeholder="Ej. Pastel 3 Leches Clásico"
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg
+                    focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent" />
+        </div>
+
+        <!-- Precio -->
+        <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                Precio de venta
+            </label>
+
+            <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
+
+                <input
+                type="number"
+                [(ngModel)]="form.precio"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                class="w-full pl-7 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg
+                        focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent" />
+            </div>
+        </div>
+
+        <!-- Categoría principal -->
+        <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                Categoría
+            </label>
+
+            <select
+                [(ngModel)]="padreSeleccionadoId"
+                (ngModelChange)="onPadreChange()"
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-white
+                    focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent" >
+
+                <option value="" disabled>Seleccionar categoría...</option>
+
+                @for (cat of categoriasPrincipales; track cat._id) {
+                    <option [value]="cat._id">{{ cat.nombre }}</option>
+                }
+            </select>   
+        </div>
+
+        <!-- Subcategoría (solo si seleccionó Pasteles) -->
+        @if (mostrarSubcategorias) {
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                Tipo de pastel
+                </label>
+
+                <select
+                [(ngModel)]="form.categoriaId"
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-white
+                        focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent" >
+                    <option value="" disabled>Seleccionar tipo...</option>
+                    
+                    @for (sub of subcategoriasPasteles; track sub._id) {
+                        <option [value]="sub._id">{{ sub.nombre }}</option>
+                    }
+                </select>
+            </div>
+        }
+
+        <!-- Descripción -->
+        <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                Descripción breve
+            </label>
+
+            <textarea
+                [(ngModel)]="form.descripcion"
+                rows="3"
+                placeholder="Ingredientes o notas de preparación..."
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg resize-none
+                    focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent">
+            </textarea>
+        </div>
+
+        <!-- Acciones -->
+        <div class="flex items-center justify-end gap-3 pt-2">
+            <button
+                (click)="cerrar.emit()"
+                class="px-4 py-2.5 text-sm font-medium text-gray-600 border border-gray-200
+                    rounded-lg hover:bg-gray-50 transition-colors" >
+                Cancelar
+            </button>
+
+            <button
+                (click)="guardar()"
+                class="px-4 py-2.5 text-sm font-semibold text-white bg-red-500
+                    hover:bg-red-600 rounded-lg transition-colors" >
+                {{ esEdicion ? 'Guardar cambios' : 'Guardar producto' }}
+            </button>
+        </div>
+    </div>
+
+</app-modal>
