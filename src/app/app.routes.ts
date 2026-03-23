@@ -55,7 +55,20 @@ export const routes: Routes = [
             path: '',
             redirectTo: 'catalogo',
             pathMatch: 'full'
-        }
-        ]
+        },
+        ],
     },
+    // Login (sin layout)
+    {
+        path: 'login',
+        loadComponent: () =>
+        import('./modules/auth/login/login')
+            .then(m => m.Login)
+    },
+
+    // Fallback
+    {
+        path: '**',
+        redirectTo: ''
+    }
 ];
