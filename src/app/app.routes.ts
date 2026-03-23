@@ -29,18 +29,33 @@ export const routes: Routes = [
             import('./modules/catalogo/catalogo-lista/catalogo-lista')
                 .then(m => m.CatalogoLista)
         },
+
         {
             path: 'inventario',
             loadComponent: () =>
             import('./modules/inventario/inventario-lista/inventario-lista')
                 .then(m => m.InventarioLista)
         },
+
         {
             path: 'pos',
             loadComponent: () =>
             import('./modules/pos/pos-panel/pos-panel')
                 .then(m => m.PosPanel)
         },
+
+        {
+            path: 'usuarios',
+            loadComponent: () =>
+            import('./modules/usuarios/usuarios-lista/usuarios-lista')
+                .then(m => m.UsuariosLista)
+        },
+
+        {
+            path: '',
+            redirectTo: 'catalogo',
+            pathMatch: 'full'
+        }
         ]
     },
 ];

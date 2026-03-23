@@ -1,5 +1,4 @@
-import { Categoria } from '../../models';
-import { Producto }  from '../../models';
+import { Categoria, Producto, Usuario } from '../../models';
 
 // ── Categorías principales ────────────────────────────────────────────────────
 export const CATEGORIAS_PRINCIPALES: Categoria[] = [
@@ -37,4 +36,14 @@ export const PRODUCTOS_MOCK: Producto[] = [
     { _id: 'p9',  nombre: 'Galletas de Chispas',         descripcion: 'Clásicas galletas con chispas de chocolate semiamargo.',        precio: 4.00,  categoriaId: 'c3', categoria: { _id: 'c3', nombre: 'Galletas'                      }, stockActual: 35 },
     { _id: 'p10', nombre: 'Gelatina de Mosaico',         descripcion: 'Colorida gelatina de leche con cubos de gelatina de sabores.',  precio: 5.00,  categoriaId: 'c4', categoria: { _id: 'c4', nombre: 'Gelatinas'                     }, stockActual: 12 },
     { _id: 'p11', nombre: 'Gelatina de Rompope',         descripcion: 'Suave gelatina cremosa con sabor a rompope.',                   precio: 5.50,  categoriaId: 'c4', categoria: { _id: 'c4', nombre: 'Gelatinas'                     }, stockActual: 0  },
+];
+
+// ── Usuarios mock ────────────────────────────────────────────────────────────
+export const USUARIOS: Usuario[] = [
+    { _id: 'u1', nombre: 'María García',   email: 'maria.garcia@bakepos.com',   rol: 'Administrador', fechaCreacion: new Date('2024-01-10'), activo: true  },
+    { _id: 'u2', nombre: 'Carlos Ruiz',    email: 'carlos.ruiz@bakepos.com',    rol: 'Empleado',      fechaCreacion: new Date('2024-02-15'), activo: true  },
+    { _id: 'u3', nombre: 'Lucía Méndez',   email: 'lucia.mendez@bakepos.com',   rol: 'Empleado',      fechaCreacion: new Date('2024-03-20'), activo: true  },
+    { _id: 'u4', nombre: 'Roberto Soto',   email: 'roberto.soto@bakepos.com',   rol: 'Empleado',      fechaCreacion: new Date('2024-04-05'), activo: false },
+    { _id: 'u5', nombre: 'Ana Torres',     email: 'ana.torres@bakepos.com',     rol: 'Empleado',      fechaCreacion: new Date('2024-05-12'), activo: true  },
+    { _id: 'u6', nombre: 'Juan Delgado',   email: 'juan.delgado@bakepos.com',   rol: 'Administrador', fechaCreacion: new Date('2024-06-18'), activo: true  },
 ];
