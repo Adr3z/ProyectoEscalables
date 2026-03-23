@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BadgeStock, Paginacion, Modal } from '../../../shared/components';
 import { EntradaForm } from '../entrada-form/entrada-form';
 import { Inventario, EstadoStock } from '../../../models';
 import { PRODUCTOS_MOCK } from '../../../shared/data/mock.data';
+
+//Busqueda
+import { Subscription } from 'rxjs';
+import { BusquedaService } from '../../../core/services/busqueda.service';
 
 @Component({
   selector: 'app-inventario-lista',
@@ -13,7 +17,7 @@ import { PRODUCTOS_MOCK } from '../../../shared/data/mock.data';
   styleUrl: './inventario-lista.css'
 })
 
-export class InventarioLista {
+export class InventarioLista implements OnInit, OnDestroy {
 
   modalAbierto  = false;
   paginaActual  = 1;
@@ -27,6 +31,21 @@ export class InventarioLista {
     stockMaximo:        50,
     fechaActualizacion: new Date()
   }));
+
+  //busqueda
+  terminoBusqueda = '';
+  private sub!: Subscription;
+
+  constructor(private busquedaService: BusquedaService) {}
+
+  ngOnInit(): void {
+    this.sub = this.busquedaService.termino$.subscribe(t => {
+      this.terminoBusqueda = t;
+      this.paginaActual    = 1;
+    });
+  }
+
+  ngOnDestroy(): void { this.sub.unsubscribe(); }
 
   //Stats
   get skusActivos(): number { 
@@ -90,19 +109,12 @@ export class InventarioLista {
   }
 
   get inventarioFiltrado(): Inventario[] {
-
-    if (this.filtroAgotadosActivo) {
-      return this.inventario.filter(i => this.getEstado(i) === 'AGOTADO');
-    }
-
-    if (this.filtroStockBajoActivo) {
-      return this.inventario.filter(i => {
-        const estado = this.getEstado(i);
-        return estado === 'BAJO' || estado === 'CRITICO';
-      });
-    }
-
-    return this.inventario;
+    if (!this.terminoBusqueda.trim()) return this.inventario;
+    const q = this.terminoBusqueda.toLowerCase();
+    return this.inventario.filter(i =>
+      i.producto?.nombre.toLowerCase().includes(q) ||
+      i.producto?.categoria?.nombre.toLowerCase().includes(q)
+    );
   }
 
 }

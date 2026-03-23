@@ -1,10 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Modal } from '../../../shared/components';
 import { Carrito } from '../carrito/carrito';
 import { CardPos } from '../card-pos/card-pos';
 import { Producto, ItemCarrito, Categoria } from '../../../models';
 import { PRODUCTOS_MOCK, CATEGORIAS_PRINCIPALES, SUBCATEGORIAS_PASTELES } from '../../../shared/data/mock.data';
+
+//Busqueda
+import { Subscription } from 'rxjs';
+import { BusquedaService } from '../../../core/services/busqueda.service';
 
 @Component({
   selector: 'app-pos-panel',
@@ -15,7 +19,7 @@ import { PRODUCTOS_MOCK, CATEGORIAS_PRINCIPALES, SUBCATEGORIAS_PASTELES } from '
 })
 
 
-export class PosPanel {
+export class PosPanel implements OnInit, OnDestroy {
 
   productos: Producto[]              = PRODUCTOS_MOCK;
   categoriasPrincipales: Categoria[] = CATEGORIAS_PRINCIPALES;
@@ -28,6 +32,20 @@ export class PosPanel {
   modalConfirmarAbierto            = false;
   ventaConfirmada                  = false;
 
+  //Busqueda
+  terminoBusqueda = '';
+  private sub!: Subscription;
+
+  constructor(private busquedaService: BusquedaService) {}
+
+  ngOnInit(): void {
+    this.sub = this.busquedaService.termino$.subscribe(t => {
+      this.terminoBusqueda = t;
+    });
+  }
+
+  ngOnDestroy(): void { this.sub.unsubscribe(); }
+
   get productosFiltrados(): Producto[] {
     let lista = this.productos.filter(p => p.stockActual > 0);
 
@@ -37,11 +55,10 @@ export class PosPanel {
       lista = lista.filter(p => p.categoriaId === this.categoriaActivaId);
     }
 
-    if (this.busqueda.trim()) {
-      const q = this.busqueda.toLowerCase();
+    if (this.terminoBusqueda.trim()) {
+      const q = this.terminoBusqueda.toLowerCase();
       lista = lista.filter(p => p.nombre.toLowerCase().includes(q));
     }
-
     return lista;
   }
 

@@ -1,9 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BadgeStock, Paginacion, Modal  } from '../../../shared/components';
 import { Producto, Categoria, EstadoStock } from '../../../models';
 import { PRODUCTOS_MOCK, CATEGORIAS_PRINCIPALES, SUBCATEGORIAS_PASTELES } from '../../../shared/data/mock.data';
 import { CatalogoForm } from '../catalogo-form/catalogo-form';
+
+import { Subscription } from 'rxjs';
+import { BusquedaService } from '../../../core/services/busqueda.service';
 
 
 @Component({
@@ -15,7 +18,7 @@ import { CatalogoForm } from '../catalogo-form/catalogo-form';
 })
 
 
-export class CatalogoLista {
+export class CatalogoLista implements OnInit, OnDestroy {
 
   //Modal de edición
   modalAbierto    = false;
@@ -37,6 +40,22 @@ export class CatalogoLista {
   categoriasPrincipales: Categoria[] = CATEGORIAS_PRINCIPALES;
   subcategoriasPasteles: Categoria[] = SUBCATEGORIAS_PASTELES;
 
+  //Busqueda
+  private sub!: Subscription;
+  terminoBusqueda      = '';
+
+  constructor(private busquedaService: BusquedaService) {}
+
+  ngOnInit(): void {
+      this.sub = this.busquedaService.termino$.subscribe(t => {
+      this.terminoBusqueda = t;
+      this.paginaActual    = 1;
+    });
+  }
+
+  ngOnDestroy(): void { this.sub.unsubscribe(); }
+
+
   //Stats
   get totalProductos(): number  { return this.productos.length; }
   get totalCategorias(): number { return CATEGORIAS_PRINCIPALES.length; }
@@ -44,12 +63,19 @@ export class CatalogoLista {
   get valorInventario(): number { return this.productos.reduce((acc, p) => acc + p.precio * p.stockActual, 0); }
 
   get productosFiltrados(): Producto[] {
-    if (!this.categoriaActivaId) return this.productos;
+      let lista = this.productos;
+      if (this.categoriaActivaId === 'c1') {
+        lista = lista.filter(p => p.categoria?.padreId === 'c1' || p.categoriaId === 'c1');
+      } else if (this.categoriaActivaId) {
+        lista = lista.filter(p => p.categoriaId === this.categoriaActivaId);
+      }
 
-    if (this.categoriaActivaId === 'c1') {
-      return this.productos.filter(p => p.categoria?.padreId === 'c1' || p.categoriaId === 'c1');
-    }
-    return this.productos.filter(p => p.categoriaId === this.categoriaActivaId);
+      if (this.terminoBusqueda.trim()) {
+        const q = this.terminoBusqueda.toLowerCase();
+        lista = lista.filter(p => p.nombre.toLowerCase().includes(q));
+      }
+
+      return lista;
   }
 
   //Slice para la página actual

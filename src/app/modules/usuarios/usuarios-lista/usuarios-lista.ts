@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Paginacion, Modal } from '../../../shared/components';
 import { UsuarioForm } from '../usuario-form/usuario-form';
 import { Usuario } from '../../../models';
 import { USUARIOS } from '../../../shared/data/mock.data';
+
+//busqueda
+import { Subscription } from 'rxjs';
+import { BusquedaService } from '../../../core/services/busqueda.service';
 
 @Component({
   selector: 'app-usuarios-lista',
@@ -13,7 +17,7 @@ import { USUARIOS } from '../../../shared/data/mock.data';
   styleUrl: './usuarios-lista.css'
 })
 
-export class UsuariosLista {
+export class UsuariosLista implements OnInit, OnDestroy {
 
   modalAbierto          = false;
   modalConfirmarAbierto = false;
@@ -23,9 +27,33 @@ export class UsuariosLista {
 
   usuarios: Usuario[] = USUARIOS;
 
+  //busqueda
+  terminoBusqueda = '';
+  private sub!: Subscription;
+
+  constructor(private busquedaService: BusquedaService) {}
+
+  ngOnInit(): void {
+    this.sub = this.busquedaService.termino$.subscribe(t => {
+      this.terminoBusqueda = t;
+      this.paginaActual    = 1;
+    });
+  }
+
+  ngOnDestroy(): void { this.sub.unsubscribe(); }
+
+  get usuariosFiltrados(): Usuario[] {
+    if (!this.terminoBusqueda.trim()) return this.usuarios;
+    const q = this.terminoBusqueda.toLowerCase();
+    return this.usuarios.filter(u =>
+      u.nombre.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q)
+    );
+  }
+
   get usuariosPaginados(): Usuario[] {
     const inicio = (this.paginaActual - 1) * this.porPagina;
-    return this.usuarios.slice(inicio, inicio + this.porPagina);
+    return this.usuariosFiltrados.slice(inicio, inicio + this.porPagina);
   }
 
   get totalAdmins(): number    { return this.usuarios.filter(u => u.rol === 'Administrador').length; }
