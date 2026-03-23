@@ -35,6 +35,12 @@ export const routes: Routes = [
             import('./modules/inventario/inventario-lista/inventario-lista')
                 .then(m => m.InventarioLista)
         },
+        {
+            path: 'pos',
+            loadComponent: () =>
+            import('./modules/pos/pos-panel/pos-panel')
+                .then(m => m.PosPanel)
+        },
         ]
     },
 ];
