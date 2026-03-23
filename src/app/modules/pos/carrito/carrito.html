@@ -1,0 +1,124 @@
+<div class="flex flex-col h-full bg-white rounded-xl border border-gray-200 overflow-hidden">
+
+    <!-- Header -->
+    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m5-9v9m4-9v9"/>
+            </svg>
+
+            <h2 class="text-sm font-semibold text-gray-800">Pedido Actual</h2>
+        </div>
+
+        @if (items.length > 0) {
+            <span class="text-xs bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full">
+                {{ items.length }} productos
+            </span>
+        }
+    </div>
+
+    <!-- Items -->
+    <div class="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+        @if (items.length === 0) {
+            <div class="flex flex-col items-center justify-center h-full text-gray-300 py-12">
+                <svg class="w-12 h-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m5-9v9m4-9v9"/>
+                </svg>
+                <p class="text-sm">Agrega productos a la venta</p>
+            </div>
+        }
+
+        @for (item of items; track item.producto._id) {
+            <div class="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
+
+                <!-- Icono -->
+                <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-1.5-.454M9 6l3-3 3 3M9 6H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V8a2 2 0 00-2-2h-3M9 6h6"/>
+                    </svg>
+                </div>
+
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-gray-800 truncate">{{ item.producto.nombre }}</p>
+                    <p class="text-xs text-gray-400">${{ item.producto.precio | number:'1.2-2' }} c/u</p>
+                </div>
+
+                <!-- Controles cantidad -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button
+                        (click)="decrementar.emit(item.producto._id)"
+                        class="w-6 h-6 rounded border border-gray-200 flex items-center justify-center
+                            text-gray-500 hover:bg-gray-50 transition-colors text-xs">
+                            −
+                    </button>
+
+                    <span class="w-6 text-center text-sm font-semibold text-gray-800">{{ item.cantidad }}</span>
+
+                    <button
+                        (click)="incrementar.emit(item.producto._id)"
+                        class="w-6 h-6 rounded border border-gray-200 flex items-center justify-center
+                            text-gray-500 hover:bg-gray-50 transition-colors text-xs">
+                            +
+                    </button>
+                </div>
+
+                <!-- Subtotal + eliminar -->
+                <div class="text-right shrink-0">
+                    <p class="text-xs font-semibold text-gray-800">
+                        ${{ (item.producto.precio * item.cantidad) | number:'1.2-2' }}
+                    </p>
+
+                    <button
+                        (click)="eliminar.emit(item.producto._id)"
+                        class="text-xs text-gray-300 hover:text-red-400 transition-colors mt-0.5">
+                        quitar
+                    </button>
+                </div>
+
+            </div>
+        }
+    </div>
+
+    <!-- Totales y acciones -->
+    @if (items.length > 0) {
+        <div class="border-t border-gray-100 px-5 py-4 space-y-3">
+            <div class="space-y-1.5 text-sm">
+                <div class="flex justify-between text-gray-500">
+                    <span>Subtotal</span>
+                    <span>${{ subtotal | number:'1.2-2' }}</span>
+                </div>
+
+                <div class="flex justify-between text-gray-500">
+                    <span>Impuesto (10%)</span>
+                    <span>${{ impuesto | number:'1.2-2' }}</span>
+                </div>
+
+                <div class="flex justify-between font-bold text-gray-900 text-base pt-1 border-t border-gray-100">
+                    <span>Total General</span>
+                    <span>${{ total | number:'1.2-2' }}</span>
+                </div>
+            </div>  
+
+            <div class="flex gap-2">
+                <button
+                (click)="cancelar.emit()"
+                class="flex-1 py-2.5 text-sm font-medium text-gray-600 border border-gray-200
+                        rounded-lg hover:bg-gray-50 transition-colors" >
+                    Cancelar
+                </button>
+
+                <button
+                (click)="confirmar.emit()"
+                class="flex-1 py-2.5 text-sm font-semibold text-white bg-red-500
+                        hover:bg-red-600 rounded-lg transition-colors" >
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    }
+
+</div>
