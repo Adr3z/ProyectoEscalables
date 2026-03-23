@@ -22,15 +22,35 @@ export class CatalogoPublico {
   categoriaActivaId: string | null = null;
   mostrarSubcategorias = false;
 
+  //busqueda
+  termino = '';
+
   get productosFiltrados(): Producto[] {
-    if (!this.categoriaActivaId) return this.productos;
-    // Si filtra por una subcategoría directa
+    let lista = this.productos;
+
     if (this.categoriaActivaId === 'c1') {
-      // Mostrar todos los pasteles (cualquier subcategoría)
-      return this.productos.filter(p => p.categoria?.padreId === 'c1' || p.categoriaId === 'c1');
+      lista = lista.filter(p => p.categoria?.padreId === 'c1' || p.categoriaId === 'c1');
+    } else if (this.categoriaActivaId) {
+      lista = lista.filter(p => p.categoriaId === this.categoriaActivaId);
     }
-    return this.productos.filter(p => p.categoriaId === this.categoriaActivaId);
+
+    if (this.termino.trim()) {
+      const q = this.termino.toLowerCase();
+      lista = lista.filter(p => p.nombre.toLowerCase().includes(q));
+    }
+
+    return lista;
   }
+
+  onBusqueda(event: Event): void {
+    this.termino = (event.target as HTMLInputElement).value;
+  }
+
+  limpiarBusqueda(): void {
+    this.termino = '';
+  }
+
+//-----------------------
 
   seleccionarPrincipal(cat: Categoria): void {
     if (cat._id === 'c1') {
