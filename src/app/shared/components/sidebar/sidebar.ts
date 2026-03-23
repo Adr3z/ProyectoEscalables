@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Rol } from '../../../models';
+import { Router } from '@angular/router';
+import { Modal } from "../modal/modal";
 
 interface NavItem {
   label: string;
@@ -13,7 +15,7 @@ interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, Modal],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css'
 })
@@ -21,6 +23,7 @@ interface NavItem {
 export class Sidebar {
 
   rolActual: Rol = 'Administrador';
+  modalCerrarSesionAbierto = false;
 
   navItems: NavItem[] = [
     { label: 'Catálogo',   ruta: '/admin/catalogo',   icono: 'catalogo',   roles: ['Administrador'] },
@@ -33,8 +36,15 @@ export class Sidebar {
     return this.navItems.filter(item => item.roles.includes(this.rolActual));
   }
 
+  constructor(private router: Router) {}
+
   //Mock para alternar rol en desarrollo
   toggleRol(): void {
     this.rolActual = this.rolActual === 'Administrador' ? 'Empleado' : 'Administrador';
+  }
+
+  confirmarCerrarSesion(): void {
+    this.modalCerrarSesionAbierto = false;
+    this.router.navigate(['/']);
   }
 }
