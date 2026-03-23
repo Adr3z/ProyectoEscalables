@@ -2,13 +2,14 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Modal } from '../../../shared/components';
 import { Carrito } from '../carrito/carrito';
+import { CardPos } from '../card-pos/card-pos';
 import { Producto, ItemCarrito, Categoria } from '../../../models';
 import { PRODUCTOS_MOCK, CATEGORIAS_PRINCIPALES, SUBCATEGORIAS_PASTELES } from '../../../shared/data/mock.data';
 
 @Component({
   selector: 'app-pos-panel',
   standalone: true,
-  imports: [CommonModule, Carrito, Modal],
+  imports: [CommonModule, Carrito, Modal, CardPos],
   templateUrl: './pos-panel.html',
   styleUrl: './pos-panel.css'
 })
