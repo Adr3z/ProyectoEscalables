@@ -1,4 +1,4 @@
-import { Categoria, Producto, Usuario } from '../../models';
+import { Categoria, Producto, Usuario, Movimiento } from '../../models';
 
 // ── Categorías principales ────────────────────────────────────────────────────
 export const CATEGORIAS_PRINCIPALES: Categoria[] = [
@@ -46,4 +46,20 @@ export const USUARIOS: Usuario[] = [
     { _id: 'u4', nombre: 'Roberto Soto',   email: 'roberto.soto@bakepos.com',   rol: 'Empleado',      fechaCreacion: new Date('2024-04-05'), activo: false },
     { _id: 'u5', nombre: 'Ana Torres',     email: 'ana.torres@bakepos.com',     rol: 'Empleado',      fechaCreacion: new Date('2024-05-12'), activo: true  },
     { _id: 'u6', nombre: 'Juan Delgado',   email: 'juan.delgado@bakepos.com',   rol: 'Administrador', fechaCreacion: new Date('2024-06-18'), activo: true  },
+];
+
+// ── Movimientos mock ─────────────────────────────────────────────────────────
+export const MOVIMIENTOS_MOCK: Movimiento[] = [
+    { _id: 'm1',  tipo: 'ENTRADA', productoId: 'p1',  producto: PRODUCTOS_MOCK[0],  cantidad: 10, fecha: new Date('2026-03-01T09:00:00'), usuarioId: 'u1' },
+    { _id: 'm2',  tipo: 'SALIDA',  productoId: 'p1',  producto: PRODUCTOS_MOCK[0],  cantidad: 2,  fecha: new Date('2026-03-01T11:30:00'), usuarioId: 'u2' },
+    { _id: 'm3',  tipo: 'ENTRADA', productoId: 'p2',  producto: PRODUCTOS_MOCK[1],  cantidad: 8,  fecha: new Date('2026-03-02T08:15:00'), usuarioId: 'u1' },
+    { _id: 'm4',  tipo: 'SALIDA',  productoId: 'p3',  producto: PRODUCTOS_MOCK[2],  cantidad: 3,  fecha: new Date('2026-03-02T14:00:00'), usuarioId: 'u2' },
+    { _id: 'm5',  tipo: 'ENTRADA', productoId: 'p6',  producto: PRODUCTOS_MOCK[5],  cantidad: 20, fecha: new Date('2026-03-03T09:30:00'), usuarioId: 'u1' },
+    { _id: 'm6',  tipo: 'SALIDA',  productoId: 'p8',  producto: PRODUCTOS_MOCK[7],  cantidad: 5,  fecha: new Date('2026-03-03T16:00:00'), usuarioId: 'u3' },
+    { _id: 'm7',  tipo: 'ENTRADA', productoId: 'p4',  producto: PRODUCTOS_MOCK[3],  cantidad: 12, fecha: new Date('2026-03-04T08:00:00'), usuarioId: 'u1' },
+    { _id: 'm8',  tipo: 'SALIDA',  productoId: 'p5',  producto: PRODUCTOS_MOCK[4],  cantidad: 4,  fecha: new Date('2026-03-04T12:45:00'), usuarioId: 'u2' },
+    { _id: 'm9',  tipo: 'SALIDA',  productoId: 'p9',  producto: PRODUCTOS_MOCK[8],  cantidad: 6,  fecha: new Date('2026-03-05T10:00:00'), usuarioId: 'u3' },
+    { _id: 'm10', tipo: 'ENTRADA', productoId: 'p10', producto: PRODUCTOS_MOCK[9],  cantidad: 15, fecha: new Date('2026-03-05T15:30:00'), usuarioId: 'u1' },
+    { _id: 'm11', tipo: 'SALIDA',  productoId: 'p7',  producto: PRODUCTOS_MOCK[6],  cantidad: 3,  fecha: new Date('2026-03-06T09:00:00'), usuarioId: 'u2' },
+    { _id: 'm12', tipo: 'ENTRADA', productoId: 'p11', producto: PRODUCTOS_MOCK[10], cantidad: 10, fecha: new Date('2026-03-06T11:00:00'), usuarioId: 'u1' },
 ];
