@@ -1,0 +1,75 @@
+<app-modal [titulo]="titulo" [abierto]="abierto" (cerrar)="cerrar.emit()">
+    <div class="space-y-4">
+        <!-- Nombre -->
+        <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                Nombre
+            </label>
+
+            <input
+                type="text"
+                [(ngModel)]="form.nombre"
+                placeholder="Ej. Pasteles"
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg
+                    focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
+            />
+        </div>
+
+        <!-- Categoría padre (opcional) -->
+        <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                Subcategoría de (opcional)
+            </label>
+
+            <select
+                [(ngModel)]="form.padreId"
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-white
+                    focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent" >
+
+                <option value="">Ninguna — categoría principal</option>
+
+                @for (cat of categoriasPrincipales; track cat._id) {
+                    <option [value]="cat._id">{{ cat.nombre }}</option>
+                }
+            </select>
+
+            <p class="text-xs text-gray-400 mt-1">
+                Si seleccionas una categoría padre, esta será una subcategoría.
+            </p>
+        </div>
+
+        <!-- Descripción -->
+        <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                Descripción (opcional)
+            </label>
+
+            <textarea
+                [(ngModel)]="form.descripcion"
+                rows="2"
+                placeholder="Descripción breve de la categoría..."
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg resize-none
+                    focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent">
+                </textarea>
+        </div>
+
+        <!-- Acciones -->
+        <div class="flex items-center justify-end gap-3 pt-2">
+            <button
+                (click)="cerrar.emit()"
+                class="px-4 py-2.5 text-sm font-medium text-gray-600 border border-gray-200
+                    rounded-lg hover:bg-gray-50 transition-colors">
+
+                Cancelar
+            </button>
+
+            <button
+                (click)="guardar()"
+                class="px-4 py-2.5 text-sm font-semibold text-white bg-red-500
+                    hover:bg-red-600 rounded-lg transition-colors" >
+                    
+                {{ esEdicion ? 'Guardar cambios' : 'Crear categoría' }}
+            </button>
+        </div>
+    </div>
+</app-modal>
