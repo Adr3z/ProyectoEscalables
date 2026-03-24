@@ -3,12 +3,22 @@ import { CommonModule } from '@angular/common';
 import { Modal } from '../../../shared/components';
 import { Carrito } from '../carrito/carrito';
 import { CardPos } from '../card-pos/card-pos';
-import { Producto, ItemCarrito, Categoria } from '../../../models';
-import { PRODUCTOS_MOCK, CATEGORIAS_PRINCIPALES, SUBCATEGORIAS_PASTELES } from '../../../shared/data/mock.data';
+import { Producto, ItemCarrito, Categoria, Inventario } from '../../../models';
+import { PRODUCTOS_MOCK, CATEGORIAS_PRINCIPALES, SUBCATEGORIAS_PASTELES, INVENTARIO_MOCK } from '../../../shared/data/mock.data';
 
 //Busqueda
 import { Subscription } from 'rxjs';
 import { BusquedaService } from '../../../core/services/busqueda.service';
+
+export type EstadoItemVenta = 'ok' | 'bajo-minimo' | 'insuficiente';
+
+export interface ItemValidado {
+  item: ItemCarrito;
+  estado: EstadoItemVenta;
+  stockTrasVenta: number;
+  stockMinimo: number;
+}
+
 
 @Component({
   selector: 'app-pos-panel',
@@ -25,6 +35,7 @@ export class PosPanel implements OnInit, OnDestroy {
   categoriasPrincipales: Categoria[] = CATEGORIAS_PRINCIPALES;
   subcategoriasPasteles: Categoria[] = SUBCATEGORIAS_PASTELES;
 
+  inventario: Inventario[] = INVENTARIO_MOCK;
   categoriaActivaId: string | null = null;
   mostrarSubcategorias             = false;
   busqueda                         = '';
@@ -130,5 +141,35 @@ export class PosPanel implements OnInit, OnDestroy {
 
   enCarrito(productoId: string): number {
     return this.carrito.find(i => i.producto._id === productoId)?.cantidad ?? 0;
+  }
+
+
+  // Validación de stock
+  getStockMinimo(productoId: string): number {
+    return this.inventario.find(i => i.productoId === productoId)?.stockMinimo ?? 0;
+  }
+
+  getEstadoItem(item: ItemCarrito): EstadoItemVenta {
+    const stockTras = item.producto.stockActual - item.cantidad;
+    if (stockTras < 0) return 'insuficiente';
+    if (stockTras < this.getStockMinimo(item.producto._id)) return 'bajo-minimo';
+    return 'ok';
+  }
+
+  get itemsValidados(): ItemValidado[] {
+    return this.carrito.map(item => ({
+      item,
+      estado:         this.getEstadoItem(item),
+      stockTrasVenta: item.producto.stockActual - item.cantidad,
+      stockMinimo:    this.getStockMinimo(item.producto._id)
+    }));
+  }
+
+  get hayInsuficiente(): boolean {
+    return this.itemsValidados.some(v => v.estado === 'insuficiente');
+  }
+
+  get hayBajoMinimo(): boolean {
+    return this.itemsValidados.some(v => v.estado === 'bajo-minimo');
   }
 }

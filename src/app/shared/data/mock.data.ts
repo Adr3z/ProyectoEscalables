@@ -1,4 +1,4 @@
-import { Categoria, Producto, Usuario, Movimiento } from '../../models';
+import { Categoria, Producto, Usuario, Movimiento, Inventario } from '../../models';
 
 // ── Categorías principales ────────────────────────────────────────────────────
 export const CATEGORIAS_PRINCIPALES: Categoria[] = [
@@ -63,3 +63,13 @@ export const MOVIMIENTOS_MOCK: Movimiento[] = [
     { _id: 'm11', tipo: 'SALIDA',  productoId: 'p7',  producto: PRODUCTOS_MOCK[6],  cantidad: 3,  fecha: new Date('2026-03-06T09:00:00'), usuarioId: 'u2' },
     { _id: 'm12', tipo: 'ENTRADA', productoId: 'p11', producto: PRODUCTOS_MOCK[10], cantidad: 10, fecha: new Date('2026-03-06T11:00:00'), usuarioId: 'u1' },
 ];
+
+// ── Movimientos mock ─────────────────────────────────────────────────────────
+export const INVENTARIO_MOCK: Inventario[] = PRODUCTOS_MOCK.map((p, i) => ({
+    _id:                `inv-${i + 1}`,
+    productoId:         p._id,
+    producto:           p,
+    stockMinimo:        5,
+    stockMaximo:        50,
+    fechaActualizacion: new Date()
+}));

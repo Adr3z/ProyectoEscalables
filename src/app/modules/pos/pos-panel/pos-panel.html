@@ -106,35 +106,98 @@
     </div>
 }
 
-<!-- Modal confirmar venta -->
+<!-- Modal confirmar venta con validación -->
 <app-modal titulo="Confirmar venta" [abierto]="modalConfirmarAbierto" (cerrar)="cerrarConfirmar()">
-    <div class="space-y-5">
-        <div class="flex items-start gap-3">
-            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-
-            <div>
-                <p class="text-sm font-semibold text-gray-800">¿Confirmar esta venta?</p>
-                <p class="text-sm text-gray-500 mt-1">Se registrará la venta y se descontará el stock de los productos seleccionados.</p>
-            </div>
+    <div class="space-y-4">
+        <!-- Lista de items con estado -->
+        <div class="space-y-2">
+            @for (v of itemsValidados; track v.item.producto._id) {
+                <div class="flex items-center justify-between p-3 rounded-lg border"
+                    [class.border-gray-100]="v.estado === 'ok'"
+                    [class.bg-gray-50]="v.estado === 'ok'"
+                    [class.border-orange-200]="v.estado === 'bajo-minimo'"
+                    [class.bg-orange-50]="v.estado === 'bajo-minimo'"
+                    [class.border-red-200]="v.estado === 'insuficiente'"
+                    [class.bg-red-50]="v.estado === 'insuficiente'">
+        
+                    <div class="flex items-center gap-2 min-w-0">
+                        <!-- Ícono de estado -->
+                        @if (v.estado === 'ok') {
+                            <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        } @else if (v.estado === 'bajo-minimo') {
+                            <svg class="w-4 h-4 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                            </svg>
+                        } @else {
+                            <svg class="w-4 h-4 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        }
+                        <div class="min-w-0">
+                            <p class="text-xs font-medium text-gray-800 truncate">{{ v.item.producto.nombre }}</p>
+                            
+                            @if (v.estado === 'bajo-minimo') {
+                                <p class="text-xs text-orange-600 mt-0.5">
+                                    Stock quedará en {{ v.stockTrasVenta }} (mín. {{ v.stockMinimo }})
+                                </p>
+                            } @else if (v.estado === 'insuficiente') {
+                                <p class="text-xs text-red-600 mt-0.5">
+                                    Stock insuficiente — disponible: {{ v.item.producto.stockActual }}
+                                </p>
+                            }
+                        </div>
+                    </div>
+            
+                    <span class="text-xs text-gray-500 shrink-0 ml-2">×{{ v.item.cantidad }}</span>
+                </div>
+            }
         </div>
+    
+        <!-- Banner de bloqueo -->
+        @if (hayInsuficiente) {
+            <div class="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                </svg>
 
-        <div class="flex justify-end gap-3">
-            <button
-                (click)="cerrarConfirmar()"
+                <p class="text-xs text-red-700 font-medium">
+                    No se puede confirmar — hay productos sin stock suficiente. Ajusta las cantidades para continuar.
+                </p>
+            </div>
+        } @else if (hayBajoMinimo) {
+            <div class="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <svg class="w-4 h-4 text-orange-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>
+
+                <p class="text-xs text-orange-700 font-medium">
+                    Algunos productos bajarán del stock mínimo. Puedes continuar pero se recomienda reabastecer pronto.
+                </p>
+            </div>
+        }
+    
+        <!-- Acciones -->
+        <div class="flex justify-end gap-3 pt-1">
+            <button (click)="cerrarConfirmar()"
                 class="px-4 py-2.5 text-sm font-medium text-gray-600 border border-gray-200
                     rounded-lg hover:bg-gray-50 transition-colors">
                 Cancelar
             </button>
-
+            
             <button
                 (click)="confirmarVenta()"
-                class="px-4 py-2.5 text-sm font-semibold text-white bg-green-500
-                    hover:bg-green-600 rounded-lg transition-colors">
+                [disabled]="hayInsuficiente"
+                class="px-4 py-2.5 text-sm font-semibold text-white rounded-lg transition-colors
+                    disabled:opacity-50 disabled:cursor-not-allowed"
+                [class.bg-green-500]="!hayInsuficiente"
+                [class.hover:bg-green-600]="!hayInsuficiente"
+                [class.bg-red-300]="hayInsuficiente">
                 Sí, confirmar
             </button>
         </div>
