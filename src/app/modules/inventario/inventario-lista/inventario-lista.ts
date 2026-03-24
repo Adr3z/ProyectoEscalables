@@ -105,16 +105,40 @@ export class InventarioLista implements OnInit, OnDestroy {
 
   filtrarAgotados(): void {
     this.filtroAgotadosActivo = !this.filtroAgotadosActivo;
-    this.paginaActual = 1; 
+
+    if (this.filtroAgotadosActivo) {
+      this.filtroStockBajoActivo = false;
+    }
+
+    this.paginaActual = 1;
   }
 
   get inventarioFiltrado(): Inventario[] {
-    if (!this.terminoBusqueda.trim()) return this.inventario;
-    const q = this.terminoBusqueda.toLowerCase();
-    return this.inventario.filter(i =>
-      i.producto?.nombre.toLowerCase().includes(q) ||
-      i.producto?.categoria?.nombre.toLowerCase().includes(q)
-    );
+    let resultado = this.inventario;
+
+    //búsqueda
+    if (this.terminoBusqueda.trim()) {
+      const q = this.terminoBusqueda.toLowerCase();
+      resultado = resultado.filter(i =>
+        i.producto?.nombre.toLowerCase().includes(q) ||
+        i.producto?.categoria?.nombre.toLowerCase().includes(q)
+      );
+    }
+
+    //filtro stock bajo/crítico
+    if (this.filtroStockBajoActivo) {
+      resultado = resultado.filter(i => {
+        const estado = this.getEstado(i);
+        return estado === 'BAJO' || estado === 'CRITICO';
+      });
+    }
+
+    //filtro agotados
+    if (this.filtroAgotadosActivo) {
+      resultado = resultado.filter(i => this.getEstado(i) === 'AGOTADO');
+    }
+
+    return resultado;
   }
 
 }
