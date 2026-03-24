@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { RouterLink, Router, NavigationStart} from '@angular/router';
+import { Router, NavigationStart} from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs';
@@ -8,7 +8,7 @@ import { BusquedaService } from '../../../core/services/busqueda.service';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [ FormsModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
