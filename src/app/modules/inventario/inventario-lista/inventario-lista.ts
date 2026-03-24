@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BadgeStock, Paginacion, Modal } from '../../../shared/components';
+import { BadgeStock, Paginacion } from '../../../shared/components';
 import { EntradaForm } from '../entrada-form/entrada-form';
 import { Inventario, EstadoStock } from '../../../models';
 import { PRODUCTOS_MOCK } from '../../../shared/data/mock.data';
+import { getEstadoStock } from '../../../shared/utils/stock.utils';
 
 //Busqueda
 import { Subscription } from 'rxjs';
@@ -12,7 +13,7 @@ import { BusquedaService } from '../../../core/services/busqueda.service';
 @Component({
   selector: 'app-inventario-lista',
   standalone: true,
-  imports: [CommonModule, BadgeStock, Paginacion, Modal, EntradaForm],
+  imports: [CommonModule, BadgeStock, Paginacion,  EntradaForm],
   templateUrl: './inventario-lista.html',
   styleUrl: './inventario-lista.css'
 })
@@ -75,11 +76,7 @@ export class InventarioLista implements OnInit, OnDestroy {
   }
 
   getEstado(item: Inventario): EstadoStock {
-    const stock = item.producto?.stockActual ?? 0;
-    if (stock === 0)              return 'AGOTADO';
-    if (stock <= item.stockMinimo) return 'CRITICO';
-    if (stock <= item.stockMinimo * 2) return 'BAJO';
-    return 'SUFICIENTE';
+    return getEstadoStock(item.producto?.stockActual ?? 0, item.stockMinimo);
   }
 
   abrirModal(): void  { 

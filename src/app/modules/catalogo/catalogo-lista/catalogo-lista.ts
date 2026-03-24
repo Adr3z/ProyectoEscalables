@@ -4,7 +4,9 @@ import { BadgeStock, Paginacion, Modal  } from '../../../shared/components';
 import { Producto, Categoria, EstadoStock } from '../../../models';
 import { PRODUCTOS_MOCK, CATEGORIAS_PRINCIPALES, SUBCATEGORIAS_PASTELES } from '../../../shared/data/mock.data';
 import { CatalogoForm } from '../catalogo-form/catalogo-form';
+import { getEstadoStock } from '../../../shared/utils/stock.utils';
 
+//Búsqueda
 import { Subscription } from 'rxjs';
 import { BusquedaService } from '../../../core/services/busqueda.service';
 
@@ -36,6 +38,7 @@ export class CatalogoLista implements OnInit, OnDestroy {
   paginaActual = 1;
   porPagina = 5;
 
+  //Mockdata
   productos: Producto[]              = PRODUCTOS_MOCK;
   categoriasPrincipales: Categoria[] = CATEGORIAS_PRINCIPALES;
   subcategoriasPasteles: Categoria[] = SUBCATEGORIAS_PASTELES;
@@ -89,10 +92,7 @@ export class CatalogoLista implements OnInit, OnDestroy {
   }
 
   getEstado(stock: number): EstadoStock {
-    if (stock === 0)  return 'AGOTADO';
-    if (stock <= 5)   return 'CRITICO';
-    if (stock <= 10)  return 'BAJO';
-    return 'SUFICIENTE';
+    return getEstadoStock(stock);
   }
 
   getNombreCategoria(producto: Producto): string {
