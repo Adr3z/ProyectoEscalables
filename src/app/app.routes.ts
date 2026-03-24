@@ -38,6 +38,13 @@ export const routes: Routes = [
         },
 
         {
+            path: 'movimientos',
+            loadComponent: () =>
+            import('./modules/inventario/movimientos-lista/movimientos-lista')
+                .then(m => m.MovimientosLista)
+        },
+
+        {
             path: 'pos',
             loadComponent: () =>
             import('./modules/pos/pos-panel/pos-panel')

@@ -27,7 +27,8 @@ export class Sidebar {
 
   navItems: NavItem[] = [
     { label: 'Catálogo',   ruta: '/admin/catalogo',   icono: 'catalogo',   roles: ['Administrador'] },
-    { label: 'Inventario', ruta: '/admin/inventario', icono: 'inventario', roles: ['Administrador', 'Empleado'] },
+    { label: 'Inventario',   ruta: '/admin/inventario',  icono: 'inventario',  roles: ['Administrador', 'Empleado'] },
+    { label: 'Movimientos',  ruta: '/admin/movimientos', icono: 'movimientos', roles: ['Administrador'] },
     { label: 'POS',        ruta: '/admin/pos',        icono: 'pos',        roles: ['Administrador', 'Empleado'] },
     { label: 'Usuarios',   ruta: '/admin/usuarios',   icono: 'usuarios',   roles: ['Administrador'] },
   ];
