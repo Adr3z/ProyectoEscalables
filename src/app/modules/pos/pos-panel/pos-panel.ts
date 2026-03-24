@@ -3,22 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Modal } from '../../../shared/components';
 import { Carrito } from '../carrito/carrito';
 import { CardPos } from '../card-pos/card-pos';
-import { Producto, ItemCarrito, Categoria, Inventario } from '../../../models';
+import { Producto, ItemCarrito, Categoria, Inventario, ItemValidado, EstadoItemVenta } from '../../../models';
 import { PRODUCTOS_MOCK, CATEGORIAS_PRINCIPALES, SUBCATEGORIAS_PASTELES, INVENTARIO_MOCK } from '../../../shared/data/mock.data';
 
 //Busqueda
 import { Subscription } from 'rxjs';
 import { BusquedaService } from '../../../core/services/busqueda.service';
-
-export type EstadoItemVenta = 'ok' | 'bajo-minimo' | 'insuficiente';
-
-export interface ItemValidado {
-  item: ItemCarrito;
-  estado: EstadoItemVenta;
-  stockTrasVenta: number;
-  stockMinimo: number;
-}
-
 
 @Component({
   selector: 'app-pos-panel',

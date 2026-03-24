@@ -31,3 +31,12 @@ export interface ItemCarrito {
     producto: Producto;
     cantidad: number;
 }
+
+export type EstadoItemVenta = 'ok' | 'bajo-minimo' | 'insuficiente';
+
+export interface ItemValidado {
+    item: ItemCarrito;
+    estado: EstadoItemVenta;
+    stockTrasVenta: number;
+    stockMinimo: number;
+}
