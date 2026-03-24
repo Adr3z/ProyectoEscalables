@@ -5,6 +5,7 @@ import { EntradaForm } from '../entrada-form/entrada-form';
 import { Inventario, EstadoStock } from '../../../models';
 import { PRODUCTOS_MOCK } from '../../../shared/data/mock.data';
 import { getEstadoStock } from '../../../shared/utils/stock.utils';
+import { StockForm } from '../stock-form/stock-form';
 
 //Busqueda
 import { Subscription } from 'rxjs';
@@ -13,14 +14,16 @@ import { BusquedaService } from '../../../core/services/busqueda.service';
 @Component({
   selector: 'app-inventario-lista',
   standalone: true,
-  imports: [CommonModule, BadgeStock, Paginacion,  EntradaForm],
+  imports: [CommonModule, BadgeStock, Paginacion,  EntradaForm, StockForm],
   templateUrl: './inventario-lista.html',
   styleUrl: './inventario-lista.css'
 })
 
 export class InventarioLista implements OnInit, OnDestroy {
 
-  modalAbierto  = false;
+  modalEntradaAbierto  = false;
+  modalStockAbierto = false;
+  inventarioEditar: Inventario | null = null;
   paginaActual  = 1;
   porPagina     = 5;
 
@@ -79,12 +82,32 @@ export class InventarioLista implements OnInit, OnDestroy {
     return getEstadoStock(item.producto?.stockActual ?? 0, item.stockMinimo);
   }
 
-  abrirModal(): void  { 
-    this.modalAbierto = true; 
+  abrirEntrada(): void  { 
+    this.modalEntradaAbierto = true; 
   }
 
-  cerrarModal(): void { 
-    this.modalAbierto = false; 
+  cerrarEntrada(): void { 
+    this.modalEntradaAbierto = false; 
+  }
+
+  abrirEditarStock(item: Inventario): void {
+    this.inventarioEditar = item;
+    this.modalStockAbierto = true;
+  }
+
+  cerrarStock(): void {
+    this.modalStockAbierto = false;
+  }
+
+  guardarStock(valores: { stockMinimo: number; stockMaximo: number }): void {
+    if (this.inventarioEditar) {
+      this.inventario = this.inventario.map(i =>
+        i._id === this.inventarioEditar!._id
+          ? { ...i, ...valores, fechaActualizacion: new Date() }
+          : i
+      );
+    }
+    this.inventarioEditar = null;
   }
 
   //Filtros

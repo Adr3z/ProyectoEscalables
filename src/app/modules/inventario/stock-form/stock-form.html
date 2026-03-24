@@ -1,0 +1,84 @@
+<app-modal titulo="Editar límites de stock" [abierto]="abierto" (cerrar)="cerrar.emit()">
+
+    <div class="space-y-5">
+
+        <!-- Producto -->
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-pink-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <!-- Base del pastel -->
+                    <rect x="3" y="10" width="18" height="10" rx="2"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+                    <!-- Parte superior (rebanada) -->
+                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 10L12 5L21 10"/>
+
+                    <!-- Relleno ondulado -->
+                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    d="M5 14c2-2 4 2 6 0s4-2 6 0"/>
+
+                    <!-- Cereza -->
+                    <circle cx="12" cy="6" r="1.5" stroke-width="2"/>
+                    <path stroke-width="2" stroke-linecap="round"
+                    d="M12 4c0-1.5-1-2.5-2-3"/>
+                </svg>
+            </div>
+
+            <p class="text-sm font-medium text-gray-700">{{ nombreProducto }}</p>
+        </div>
+
+        <!-- Campos -->
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                Stock mínimo
+                </label>
+
+                <input
+                type="number"
+                [(ngModel)]="form.stockMinimo"
+                min="0"
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg
+                        focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
+                />
+
+                <p class="text-xs text-gray-400 mt-1">Genera alerta si el stock baja de este valor.</p>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                Stock máximo
+                </label>
+
+                <input
+                type="number"
+                [(ngModel)]="form.stockMaximo"
+                min="0"
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg
+                        focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
+                />
+
+                <p class="text-xs text-gray-400 mt-1">Límite máximo de inventario.</p>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="flex justify-end gap-3 pt-1">
+            <button
+                (click)="cerrar.emit()"
+                class="px-4 py-2.5 text-sm font-medium text-gray-600 border border-gray-200
+                    rounded-lg hover:bg-gray-50 transition-colors" >
+                Cancelar
+            </button>
+
+            <button
+                (click)="onGuardar()"
+                class="px-4 py-2.5 text-sm font-semibold text-white bg-red-500
+                    hover:bg-red-600 rounded-lg transition-colors" >
+                Guardar
+            </button>
+        </div>
+    </div>
+
+</app-modal>
