@@ -33,6 +33,12 @@ export class PosPanel implements OnInit, OnDestroy {
   modalConfirmarAbierto            = false;
   ventaConfirmada                  = false;
 
+  carritoVisible = false;
+
+  get itemsEnCarrito() { return this.carrito.reduce((a, i) => a + i.cantidad, 0); }
+  get totalCarrito() { return this.carrito.reduce((a, i) => a + i.producto.precio * i.cantidad, 0); }
+  toggleCarrito() { this.carritoVisible = !this.carritoVisible; }
+
   //Busqueda
   terminoBusqueda = '';
   private sub!: Subscription;

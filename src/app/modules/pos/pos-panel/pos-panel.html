@@ -1,5 +1,4 @@
-<div class="flex gap-5 h-[calc(100vh-8rem)]">
-
+<div class="flex flex-col h-[calc(100vh-4rem)] lg:h-[calc(100vh-8rem)] lg:flex-row lg:gap-5">
     <!-- Panel izquierdo: productos -->
     <div class="flex-1 flex flex-col gap-4 min-w-0">
         <!-- Filtros -->
@@ -58,9 +57,9 @@
         </div>
 
         <!-- Grid de productos -->
-        <div class="flex-1 overflow-y-auto">
+        <div class="flex-1 overflow-y-auto pb-24 lg:pb-4">
             @if (productosFiltrados.length > 0) {
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 pt-2 pr-3">
+                <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 pt-2 pr-3">
                     @for (producto of productosFiltrados; track producto._id) {
                         <app-card-pos
                         [producto]="producto"
@@ -81,8 +80,8 @@
 
     </div>
 
-    <!-- Panel derecho: carrito -->
-    <div class="w-80 shrink-0">
+    <!-- Panel derecho: carrito escritorio-->
+    <div class="hidden lg:flex lg:w-72 shrink-0 flex-col">
         <app-carrito
         [items]="carrito"
         (incrementar)="incrementar($event)"
@@ -95,9 +94,89 @@
 
 </div>
 
+<!-- Carrito para movil y tablet -->
+<button
+    (click)="toggleCarrito()"
+    class="lg:hidden fixed bottom-5 right-5 z-30 flex items-center gap-2.5 bg-red-500 hover:bg-red-600
+            text-white font-semibold text-sm pl-4 pr-3 py-3 rounded-2xl shadow-lg transition-all">
+    
+    <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+    </svg>
+    
+    @if (itemsEnCarrito > 0) {
+        <span class="flex items-center gap-2">
+        <span class="bg-white/25 rounded-lg px-2 py-0.5 text-xs font-bold leading-tight">
+            {{ itemsEnCarrito }} ítem{{ itemsEnCarrito !== 1 ? 's' : '' }}
+        </span>
+        <span class="text-sm font-bold">${{ totalCarrito | number:'1.2-2' }}</span>
+        </span>
+    } @else {
+        <span>Carrito vacío</span>
+    }
+    
+    <svg class="w-4 h-4 ml-0.5 transition-transform duration-200"
+        [class.rotate-180]="carritoVisible"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+    </svg>
+</button>
+
+<!-- Overlay -->
+@if (carritoVisible) {
+    <div (click)="toggleCarrito()"
+        class="lg:hidden fixed inset-0 bg-black/40 z-30">
+    </div>
+}
+
+<!-- Drawer desde abajo -->
+<div
+    class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white rounded-t-2xl shadow-2xl
+            transform transition-transform duration-300 ease-in-out flex flex-col"
+    [class.translate-y-0]="carritoVisible"
+    [class.translate-y-full]="!carritoVisible"
+    style="max-height: 80vh;">
+    
+    <!-- Handle -->
+    <div class="flex justify-center pt-3 pb-1 shrink-0">
+        <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
+    </div>
+    
+    <!-- Header drawer -->
+    <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100 shrink-0">
+        <div class="flex items-center gap-2">
+            <h2 class="font-semibold text-gray-800 text-sm">Carrito de venta</h2>
+            @if (itemsEnCarrito > 0) {
+                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {{ itemsEnCarrito }}
+                </span>
+            }
+        </div>
+        <button (click)="toggleCarrito()"
+        class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </button>
+    </div>
+    
+    <!-- Contenido scrollable -->
+    <div class="overflow-y-auto flex-1">
+        <app-carrito
+        [items]="carrito"
+        (incrementar)="incrementar($event)"
+        (decrementar)="decrementar($event)"
+        (eliminar)="eliminarDelCarrito($event)"
+        (confirmar)="abrirConfirmar(); toggleCarrito()"
+        (cancelar)="cancelarVenta(); toggleCarrito()"/>
+    </div>
+</div>
+
+
 <!-- Toast venta confirmada -->
 @if (ventaConfirmada) {
-    <div class="fixed bottom-6 right-6 bg-green-500 text-white px-5 py-3 rounded-xl shadow-lg
+    <div class="fixed bottom-24 right-5 lg:bottom-6 lg:right-6 bg-green-500 text-white px-5 py-3 rounded-xl shadow-lg
                 flex items-center gap-2 text-sm font-medium z-50">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
