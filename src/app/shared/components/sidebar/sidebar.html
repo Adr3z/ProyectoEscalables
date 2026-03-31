@@ -1,7 +1,18 @@
-<aside class="w-60 bg-white border-r border-gray-200 flex flex-col h-full shrink-0">
+@if (sidebarAbierto) {
+    <div (click)="sidebarAbierto = false" 
+        class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 lg:hidden">
+    </div>
+}
+
+<aside [class.translate-x-0]="sidebarAbierto"
+        [class.-translate-x-full]="!sidebarAbierto"
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 flex flex-col h-full shrink-0 
+            transition-transform duration-300 ease-in-out
+            lg:relative lg:translate-x-0 lg:w-60">
 
     <!-- Logo -->
-    <div class="h-14 flex items-center gap-2.5 px-5 border-b border-gray-200">
+    <div class="h-14 flex items-center gap-2.5 px-5 border-b border-gray-200
+            justify-between lg:justify-start">
         <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center shrink-0">
             <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <!-- Base del pastel -->
@@ -23,10 +34,17 @@
             </svg>
         </div>
         
-        <div>
+        <div class="truncate">
             <p class="text-sm font-bold text-gray-900 leading-none">BakePOS</p>
             <p class="text-xs text-gray-400 mt-0.5">{{ rolActual }}</p>
         </div>
+
+        <button (click)="sidebarAbierto = false" 
+                class="lg:hidden p-1.5 ml-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 rounded-md transition-colors">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
     </div>
 
     <!-- Nav -->

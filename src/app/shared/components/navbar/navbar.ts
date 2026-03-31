@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
 import { Router, NavigationStart} from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -17,6 +17,12 @@ export class Navbar implements OnDestroy {
   usuarioNombre = 'Ana Baker';
   usuarioRol    = 'Gerente';
   termino       = '';
+
+  @Output() abrirMenu = new EventEmitter<void>();
+
+  onAbrirMenu() {
+    this.abrirMenu.emit();
+}
 
   private sub: Subscription;
   

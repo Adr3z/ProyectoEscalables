@@ -24,6 +24,7 @@ export class Sidebar {
 
   rolActual: Rol = 'Administrador';
   modalCerrarSesionAbierto = false;
+  sidebarAbierto: boolean = false
 
   navItems: NavItem[] = [
     { label: 'Catálogo',   ruta: '/admin/catalogo',   icono: 'catalogo',   roles: ['Administrador'] },
@@ -47,5 +48,9 @@ export class Sidebar {
   confirmarCerrarSesion(): void {
     this.modalCerrarSesionAbierto = false;
     this.router.navigate(['/']);
+  }
+
+  toggleSidebar() {
+    this.sidebarAbierto = !this.sidebarAbierto;
   }
 }

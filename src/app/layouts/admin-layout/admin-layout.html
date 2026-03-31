@@ -1,16 +1,16 @@
 <div class="flex h-screen overflow-hidden bg-gray-50">
 
     <!-- Sidebar -->
-    <app-sidebar/>
+    <app-sidebar #sidebar />
 
     <!-- Contenido principal -->
     <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
 
         <!-- Navbar -->
-        <app-navbar/>
+        <app-navbar (abrirMenu)="sidebar.sidebarAbierto = true" />
 
         <!-- Vista activa -->
-        <main class="flex-1 overflow-y-auto p-6">
+        <main class="flex-1 overflow-y-auto relative p-4 lg:p-8">
             <router-outlet/>
         </main>
 
