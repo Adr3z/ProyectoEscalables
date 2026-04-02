@@ -35,6 +35,8 @@ class Server {
         this.app.get('/api', (req, res) => {
             res.json({ ok: true, mensaje: 'BakePOS API corriendo' });
         });
+
+        this.app.use(this.paths.categorias, require('../routes/categoria.routes'));
     }
 
 
