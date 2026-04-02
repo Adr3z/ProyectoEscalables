@@ -88,7 +88,7 @@ const updateCategoria = async (req, res) => {
 
 
 //DELETE /api/categorias/:id
-//Eliminar una antena
+//Eliminar una categoria
 const deleteCategoria = async( req, res) =>{
     try {
         const categoria = await Categoria.findByIdAndDelete(req.params.id);

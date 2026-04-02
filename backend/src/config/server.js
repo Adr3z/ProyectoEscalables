@@ -37,6 +37,8 @@ class Server {
         });
 
         this.app.use(this.paths.categorias, require('../routes/categoria.routes'));
+        this.app.use(this.paths.productos, require('../routes/productos.routes'));
+
     }
 
 
