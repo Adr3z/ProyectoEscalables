@@ -38,7 +38,7 @@ const getProductoById = async (req, res) => {
 //Obtener productos para el catalogo publico
 const getProductosPublicos = async( req, res) => {
     try {
-        const productos = await Producto.find({ stockActual: { $gt: 0} }).populate('categoriaId', 'nombre').select('nombre descripcion precio categoriaId stockActual');
+        const productos = await Producto.find({ stockActual: { $gt: 0} }).populate('categoriaId', 'nombre descripcion').select('nombre descripcion precio categoriaId stockActual');
         res.status(200).json(productos);
     }catch (error) {
         res.status(500).json({

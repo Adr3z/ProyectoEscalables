@@ -12,6 +12,12 @@ const CategoriaSchema = Schema({
     descripcion: {
         type: String,
         trim: true,
+    },
+
+    padreId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Categoria',
+    default: null, // null = categoría principal
     }
 });
 

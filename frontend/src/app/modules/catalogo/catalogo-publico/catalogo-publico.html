@@ -1,13 +1,11 @@
 <div class="max-w-6xl mx-auto px-6 py-10">
 
-    <!-- Hero -->
     <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900">Nuestro Catálogo</h1>
             <p class="text-gray-500 mt-2 text-sm">Productos frescos elaborados diariamente para ti.</p>
         </div>
 
-        <!-- Barra de búsqueda -->
         <div class="relative w-full sm:w-72">
             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -17,13 +15,13 @@
 
             <input
                 type="text"
-                [value]="termino"
+                [value]="termino()"
                 (input)="onBusqueda($event)"
                 placeholder="Buscar productos..."
                 class="w-full pl-9 pr-9 py-2.5 text-sm bg-white border border-gray-200 rounded-lg
                     focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
             />
-            @if (termino) {
+            @if (termino()) {
                 <button
                 (click)="limpiarBusqueda()"
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" >
@@ -35,20 +33,18 @@
         </div>
     </div>
 
-    <!-- Filtros -->
     <div class="mb-8 space-y-2">
 
-        <!-- Categorías principales -->
         <div class="flex items-center gap-2 flex-wrap">
 
             <button
                 (click)="limpiarFiltro()"
                 class="px-4 py-2 rounded-full text-sm font-medium border transition-colors"
-                [class.bg-red-500]="!categoriaActivaId"
-                [class.text-white]="!categoriaActivaId"
-                [class.border-red-500]="!categoriaActivaId"
-                [class.border-gray-200]="!!categoriaActivaId"
-                [class.text-gray-600]="!!categoriaActivaId" >
+                [class.bg-red-500]="!categoriaActivaId()"
+                [class.text-white]="!categoriaActivaId()"
+                [class.border-red-500]="!categoriaActivaId()"
+                [class.border-gray-200]="!!categoriaActivaId()"
+                [class.text-gray-600]="!!categoriaActivaId()" >
                 Todos
             </button>
 
@@ -64,11 +60,11 @@
 
                 {{ cat.nombre }}
 
-                @if (cat._id === 'c1') {
+                @if (subcategorias | tieneHijos: cat._id) {
                     <svg class="w-3.5 h-3.5 transition-transform"
-                        [class.rotate-180]="mostrarSubcategorias"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    [class.rotate-180]="padreActivoId() === cat._id"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
                 }
 
@@ -77,10 +73,9 @@
 
         </div>
 
-        <!-- Subcategorías de Pasteles -->
         @if (mostrarSubcategorias) {
             <div class="flex items-center gap-2 flex-wrap pl-4 border-l-2 border-red-200">
-                @for (sub of subcategoriasPasteles; track sub._id) {
+                @for (sub of subcategoriasVisibles; track sub._id) {
                     <button
                         (click)="seleccionarSubcategoria(sub)"
                         class="px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
@@ -97,21 +92,33 @@
 
     </div>
 
-    <!-- Grid de productos -->
-    @if (productosFiltrados.length > 0) {
+    @if (cargando()) {
+        <div class="flex justify-center py-24 text-gray-400 text-sm">
+        Cargando productos...
+        </div>
+    }
+
+    @if (error()) {
+        <div class="flex justify-center py-24 text-red-400 text-sm">
+        {{ error() }}
+        </div>
+    }
+
+    @if (!cargando() && !error()) {
+        @if (productosFiltrados().length > 0) {
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            @for (producto of productosFiltrados; track producto._id) {
-                <app-card-producto [producto]="producto"/>
+            @for (producto of productosFiltrados(); track producto._id) {
+            <app-card-producto [producto]="producto"/>
             }
         </div>
-    } @else {
+        } @else {
         <div class="flex flex-col items-center justify-center py-24 text-gray-400">
             <svg class="w-12 h-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m5-9v9m4-9v9"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m5-9v9m4-9v9"/>
             </svg>
-            
             <p class="text-sm">No hay productos en esta categoría.</p>
         </div>
+        }
     }
 </div>
