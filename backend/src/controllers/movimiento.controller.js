@@ -7,7 +7,7 @@ const getMovimientos = async (req, res) => {
         const movimientos = await Movimiento.find()
         .populate('productoId', 'nombre')
         .populate('usuarioId', 'nombre email')
-        .sort({ ffecha: -1 });
+        .sort({ fecha: -1 });
 
         res.status(200).json(movimientos);
     } catch (error) {

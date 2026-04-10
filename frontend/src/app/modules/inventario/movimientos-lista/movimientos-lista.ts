@@ -1,13 +1,13 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, effect, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Paginacion, Modal } from '../../../shared/components';
-import { Movimiento, TipoMovimiento } from '../../../models';
-import { MOVIMIENTOS_MOCK } from '../../../shared/data/mock.data';
+import { Movimiento } from '../../../models';
 
 //Búsqueda
 import { Subscription } from 'rxjs';
 import { BusquedaService } from '../../../core/services/busqueda.service';
+import { MovimientoService } from '../../../core/services/movimiento.service';
 
 @Component({
   selector: 'app-movimientos-lista',
@@ -20,130 +20,180 @@ import { BusquedaService } from '../../../core/services/busqueda.service';
 
 export class MovimientosLista implements OnInit, OnDestroy {
 
-  movimientos: Movimiento[]       = MOVIMIENTOS_MOCK;
-  paginaActual                    = 1;
-  porPagina                       = 5;
+  movimientos = signal<Movimiento[]>([]);
+  paginaActual = signal(1);
+  porPagina = signal(5);
 
   //Modal editar
-  modalEditarAbierto              = false;
-  movimientoEditar: Movimiento | null = null;
-  cantidadEditada: number | null  = null;
+  modalEditarAbierto = signal(false);
+  movimientoEditar = signal<Movimiento | null>(null);
+  cantidadEditada = signal<number | null>(null);
 
   //Modal confirmar eliminar
-  modalConfirmarAbierto           = false;
-  movimientoEliminarId: string | null = null;
+  modalConfirmarAbierto = signal(false);
+  movimientoEliminarId = signal<string | null>(null);
 
   //Búsqueda
   private sub!: Subscription;
-  terminoBusqueda                 = '';
+  terminoBusqueda = signal('');
+
+  filtroEntradasActivo = signal(false);
+  filtroSalidasActivo = signal(false);
+  movimientosFiltradosSignal = signal<Movimiento[]>([]);
 
   constructor(
     private busquedaService: BusquedaService,
-  ) {}
+    private movimientoService: MovimientoService,
+  ) {
+    effect(() => {
+      const lista = this.movimientos();
+      const entradas = this.filtroEntradasActivo();
+      const salidas = this.filtroSalidasActivo();
+      const termino = this.terminoBusqueda().trim().toLowerCase();
+
+      let resultado = [...lista];
+
+      if (entradas) {
+        resultado = resultado.filter(m => m.tipo === 'ENTRADA');
+      }
+
+      if (salidas) {
+        resultado = resultado.filter(m => m.tipo === 'SALIDA');
+      }
+
+      if (termino) {
+        resultado = resultado.filter(m => {
+          const nombre = this.getNombreProducto(m).toLowerCase();
+          const categoria = this.getCategoriaProducto(m).toLowerCase();
+          return nombre.includes(termino) || categoria.includes(termino);
+        });
+      }
+
+      this.movimientosFiltradosSignal.set(
+        resultado.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
+      );
+    });
+  }
 
   ngOnInit(): void {
     this.sub = this.busquedaService.termino$.subscribe(t => {
-      this.terminoBusqueda = t;
-      this.paginaActual    = 1;
+      this.terminoBusqueda.set(t);
+      this.paginaActual.set(1);
     });
+
+    this.loadMovimientos();
   }
 
   ngOnDestroy(): void { this.sub.unsubscribe(); }
 
+  private loadMovimientos(): void {
+    this.movimientoService.getMovimientos().subscribe({
+      next: movimientos => {
+        this.movimientos.set(movimientos.map(mov => ({
+          ...mov,
+          producto: mov.productoId && typeof mov.productoId !== 'string' ? mov.productoId : undefined,
+        })));
+        this.paginaActual.set(1);
+      },
+      error: () => this.movimientos.set([]),
+    });
+  }
+
   //--------------------------------------------
 
-  //Filtros
-  filtroEntradasActivo = false;
-  filtroSalidasActivo  = false;
-
   toggleEntradas(): void {
-    this.filtroEntradasActivo = !this.filtroEntradasActivo;
-    if (this.filtroEntradasActivo) {
-      this.filtroSalidasActivo = false;
+    this.filtroEntradasActivo.set(!this.filtroEntradasActivo());
+    if (this.filtroEntradasActivo()) {
+      this.filtroSalidasActivo.set(false);
     }
-    this.paginaActual = 1;
+    this.paginaActual.set(1);
   }
 
   toggleSalidas(): void {
-    this.filtroSalidasActivo = !this.filtroSalidasActivo;
-    if (this.filtroSalidasActivo) {
-      this.filtroEntradasActivo = false;
+    this.filtroSalidasActivo.set(!this.filtroSalidasActivo());
+    if (this.filtroSalidasActivo()) {
+      this.filtroEntradasActivo.set(false);
     }
-    this.paginaActual = 1;
+    this.paginaActual.set(1);
   }
 
   get movimientosFiltrados(): Movimiento[] {
-    let lista = this.movimientos;
-
-    if (this.filtroEntradasActivo) {
-      lista = lista.filter(m => m.tipo === 'ENTRADA');
-    }
-
-    if (this.filtroSalidasActivo) {
-      lista = lista.filter(m => m.tipo === 'SALIDA');
-    }
-
-    if (this.terminoBusqueda.trim()) {
-      const q = this.terminoBusqueda.toLowerCase();
-      lista = lista.filter(m =>
-        m.producto?.nombre.toLowerCase().includes(q) ||
-        m.producto?.categoria?.nombre.toLowerCase().includes(q)
-      );
-    }
-
-    return lista.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+    return this.movimientosFiltradosSignal();
   }
 
   get movimientosPaginados(): Movimiento[] {
-    const inicio = (this.paginaActual - 1) * this.porPagina;
-    return this.movimientosFiltrados.slice(inicio, inicio + this.porPagina);
+    const inicio = (this.paginaActual() - 1) * this.porPagina();
+    return this.movimientosFiltrados.slice(inicio, inicio + this.porPagina());
   }
 
-  get totalEntradas(): number { return this.movimientos.filter(m => m.tipo === 'ENTRADA').length; }
-  get totalSalidas(): number  { return this.movimientos.filter(m => m.tipo === 'SALIDA').length; }
-  get unidadesEntradas(): number { return this.movimientos.filter(m => m.tipo === 'ENTRADA').reduce((acc, m) => acc + m.cantidad, 0); }
-  get unidadesSalidas(): number  { return this.movimientos.filter(m => m.tipo === 'SALIDA').reduce((acc, m) => acc + m.cantidad, 0); }
+  get totalEntradas(): number { return this.movimientos().filter(m => m.tipo === 'ENTRADA').length; }
+  get totalSalidas(): number { return this.movimientos().filter(m => m.tipo === 'SALIDA').length; }
+  get unidadesEntradas(): number { return this.movimientos().filter(m => m.tipo === 'ENTRADA').reduce((acc, m) => acc + m.cantidad, 0); }
+  get unidadesSalidas(): number { return this.movimientos().filter(m => m.tipo === 'SALIDA').reduce((acc, m) => acc + m.cantidad, 0); }
 
-  cambiarPagina(pagina: number): void { this.paginaActual = pagina; }
+  cambiarPagina(pagina: number): void { this.paginaActual.set(pagina); }
+
+  getNombreProducto(mov: Movimiento): string {
+    if (mov.producto?.nombre) {
+      return mov.producto.nombre;
+    }
+    if (mov.productoId && typeof mov.productoId !== 'string') {
+      return mov.productoId.nombre;
+    }
+    return 'Sin producto';
+  }
+
+  getCategoriaProducto(mov: Movimiento): string {
+    if (mov.producto?.categoriaId?.nombre) {
+      return mov.producto.categoriaId.nombre;
+    }
+    if (mov.productoId && typeof mov.productoId !== 'string') {
+      return mov.productoId.categoriaId?.nombre ?? '';
+    }
+    return '';
+  }
 
   //Editar
   abrirEditar(mov: Movimiento): void {
-    this.movimientoEditar  = mov;
-    this.cantidadEditada   = mov.cantidad;
-    this.modalEditarAbierto = true;
+    this.movimientoEditar.set(mov);
+    this.cantidadEditada.set(mov.cantidad);
+    this.modalEditarAbierto.set(true);
   }
 
   cerrarEditar(): void {
-    this.movimientoEditar   = null;
-    this.cantidadEditada    = null;
-    this.modalEditarAbierto = false;
+    this.movimientoEditar.set(null);
+    this.cantidadEditada.set(null);
+    this.modalEditarAbierto.set(false);
   }
 
   guardarEdicion(): void {
-    if (this.movimientoEditar && this.cantidadEditada !== null) {
-      this.movimientos = this.movimientos.map(m =>
-        m._id === this.movimientoEditar!._id
-          ? { ...m, cantidad: this.cantidadEditada! }
+    const editar = this.movimientoEditar();
+    const cantidad = this.cantidadEditada();
+    if (editar && cantidad !== null) {
+      this.movimientos.set(this.movimientos().map(m =>
+        m._id === editar._id
+          ? { ...m, cantidad }
           : m
-      );
+      ));
     }
     this.cerrarEditar();
   }
 
   //Eliminar
   confirmarEliminar(id: string): void {
-    this.movimientoEliminarId  = id;
-    this.modalConfirmarAbierto = true;
+    this.movimientoEliminarId.set(id);
+    this.modalConfirmarAbierto.set(true);
   }
 
   cancelarEliminar(): void {
-    this.movimientoEliminarId  = null;
-    this.modalConfirmarAbierto = false;
+    this.movimientoEliminarId.set(null);
+    this.modalConfirmarAbierto.set(false);
   }
 
   eliminar(): void {
-    if (this.movimientoEliminarId) {
-      this.movimientos = this.movimientos.filter(m => m._id !== this.movimientoEliminarId);
+    const id = this.movimientoEliminarId();
+    if (id) {
+      this.movimientos.set(this.movimientos().filter(m => m._id !== id));
     }
     this.cancelarEliminar();
   }

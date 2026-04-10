@@ -5,12 +5,15 @@ import { EntradaForm } from '../entrada-form/entrada-form';
 import { Inventario, EstadoStock, EntradaStockForm, Producto } from '../../../models';
 import { getEstadoStock } from '../../../shared/utils/stock.utils';
 import { StockForm } from '../stock-form/stock-form';
+import { Movimiento } from '../../../models';
+
 
 //Busqueda
 import { Subscription } from 'rxjs';
 import { BusquedaService } from '../../../core/services/busqueda.service';
 import { ProductoService } from '../../../core/services/producto.service';
 import { InventarioService } from '../../../core/services/inventario.service';
+import { MovimientoService } from '../../../core/services/movimiento.service';
 
 @Component({
   selector: 'app-inventario-lista',
@@ -31,6 +34,7 @@ export class InventarioLista implements OnInit, OnDestroy {
   productos = signal<Producto[]>([]);
   inventario = signal<Inventario[]>([]);
   inventarioFiltradoSignal = signal<Inventario[]>([]);
+  movimientosHoySignal = signal(0);
 
   //busqueda
   terminoBusqueda = signal('');
@@ -42,6 +46,7 @@ export class InventarioLista implements OnInit, OnDestroy {
     private busquedaService: BusquedaService,
     private productoService: ProductoService,
     private inventarioService: InventarioService,
+    private movimientoService: MovimientoService,
   ) {}
 
   private filtrosEffect = effect(() => {
@@ -77,6 +82,7 @@ export class InventarioLista implements OnInit, OnDestroy {
 
     this.loadProductos();
     this.loadInventario();
+    this.loadMovimientosHoy();
   }
 
   ngOnDestroy(): void { this.sub.unsubscribe(); }
@@ -91,7 +97,7 @@ export class InventarioLista implements OnInit, OnDestroy {
   }
 
   get movimientosHoy(): number { 
-    return 42; 
+    return this.movimientosHoySignal(); 
   }
 
   get productosAgotados(): number {
@@ -124,6 +130,28 @@ export class InventarioLista implements OnInit, OnDestroy {
       next: inventario => this.inventario.set(inventario),
       error: () => this.inventario.set([]),
     });
+  }
+
+  private loadMovimientosHoy(): void {
+    this.movimientoService.getMovimientos().subscribe({
+      next: movimientos => {
+        const hoy = this.obtenerFechaHoy();
+        const contadorHoy = movimientos.filter(mov => this.esMismoDia(new Date(mov.fecha), hoy)).length;
+        this.movimientosHoySignal.set(contadorHoy);
+      },
+      error: () => this.movimientosHoySignal.set(0),
+    });
+  }
+
+  private obtenerFechaHoy(): Date {
+    const ahora = new Date();
+    return new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+  }
+
+  private esMismoDia(fecha: Date, hoy: Date): boolean {
+    return fecha.getFullYear() === hoy.getFullYear() &&
+           fecha.getMonth() === hoy.getMonth() &&
+           fecha.getDate() === hoy.getDate();
   }
 
   guardarEntrada(form: EntradaStockForm): void {

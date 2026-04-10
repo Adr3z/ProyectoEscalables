@@ -10,20 +10,20 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div (click)="toggleEntradas()"
             class="rounded-xl border p-4 cursor-pointer transition"
-            [class.bg-green-50]="filtroEntradasActivo"
-            [class.border-green-300]="filtroEntradasActivo"
-            [class.bg-white]="!filtroEntradasActivo"
-            [class.border-gray-200]="!filtroEntradasActivo">
+            [class.bg-green-50]="filtroEntradasActivo()"
+            [class.border-green-300]="filtroEntradasActivo()"
+            [class.bg-white]="!filtroEntradasActivo()"
+            [class.border-gray-200]="!filtroEntradasActivo()">
             <p class="text-xs text-gray-400 font-medium uppercase tracking-wide">Entradas</p>
             <p class="text-2xl font-bold text-green-600 mt-1">{{ totalEntradas }}</p>
         </div>
 
         <div (click)="toggleSalidas()"
             class="rounded-xl border p-4 cursor-pointer transition"
-            [class.bg-red-50]="filtroSalidasActivo"
-            [class.border-red-300]="filtroSalidasActivo"
-            [class.bg-white]="!filtroSalidasActivo"
-            [class.border-gray-200]="!filtroSalidasActivo">
+            [class.bg-red-50]="filtroSalidasActivo()"
+            [class.border-red-300]="filtroSalidasActivo()"
+            [class.bg-white]="!filtroSalidasActivo()"
+            [class.border-gray-200]="!filtroSalidasActivo()">
             <p class="text-xs text-gray-400 font-medium uppercase tracking-wide">Salidas</p>
             <p class="text-2xl font-bold text-red-500 mt-1">{{ totalSalidas }}</p>
         </div>
@@ -88,8 +88,12 @@
                                 </div>
 
                                 <div>
-                                    <p class="font-medium text-gray-800">{{ mov.producto?.nombre }}</p>
-                                    <p class="text-xs text-gray-400 mt-0.5">{{ mov.producto?.categoria?.nombre }}</p>
+                                    <p class="font-medium text-gray-800">
+                                        {{ getNombreProducto(mov) }}
+                                    </p>
+                                    <p class="text-xs text-gray-400 mt-0.5">
+                                        {{ getCategoriaProducto(mov) }}
+                                    </p>
                                 </div>
                             </div>
                         </td>
@@ -140,8 +144,8 @@
         </table>
 
         <div class="px-5 py-3 border-t border-gray-100">
-            <app-paginacion [total]="movimientosFiltrados.length" [porPagina]="porPagina"
-                [paginaActual]="paginaActual" (paginaCambia)="cambiarPagina($event)"/>
+            <app-paginacion [total]="movimientosFiltrados.length" [porPagina]="porPagina()"
+                [paginaActual]="paginaActual()" (paginaCambia)="cambiarPagina($event)"/>
         </div>
     </div>
 
@@ -165,7 +169,9 @@
                 <!-- Info principal -->
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
-                        <p class="font-medium text-gray-800 text-sm truncate">{{ mov.producto?.nombre }}</p>
+                        <p class="font-medium text-gray-800 text-sm truncate">
+                            {{ getNombreProducto(mov) }}
+                        </p>
                         <!-- Badge tipo -->
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold shrink-0"
                             [class.bg-green-100]="mov.tipo === 'ENTRADA'"
@@ -185,7 +191,7 @@
                         </span>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <span class="text-xs text-gray-400">{{ mov.producto?.categoria?.nombre }}</span>
+                        <span class="text-xs text-gray-400">{{ mov.producto?.categoriaId?.nombre }}</span>
                         <span class="text-gray-300">·</span>
                         <span class="text-xs font-semibold"
                             [class.text-green-600]="mov.tipo === 'ENTRADA'"
@@ -225,33 +231,33 @@
         }
 
         <div class="px-5 py-3">
-            <app-paginacion [total]="movimientosFiltrados.length" [porPagina]="porPagina"
-                [paginaActual]="paginaActual" (paginaCambia)="cambiarPagina($event)"/>
+            <app-paginacion [total]="movimientosFiltrados.length" [porPagina]="porPagina()"
+                [paginaActual]="paginaActual()" (paginaCambia)="cambiarPagina($event)"/>
         </div>
     </div>
 
 </div>
 
 <!-- Modales sin cambios -->
-<app-modal titulo="Editar movimiento" [abierto]="modalEditarAbierto" (cerrar)="cerrarEditar()">
+<app-modal titulo="Editar movimiento" [abierto]="modalEditarAbierto()" (cerrar)="cerrarEditar()">
     <div class="space-y-4">
-        @if (movimientoEditar) {
+        @if (movimientoEditar()) {
             <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                 <span class="px-2.5 py-1 rounded-full text-xs font-semibold"
-                    [class.bg-green-100]="movimientoEditar.tipo === 'ENTRADA'"
-                    [class.text-green-700]="movimientoEditar.tipo === 'ENTRADA'"
-                    [class.bg-red-100]="movimientoEditar.tipo === 'SALIDA'"
-                    [class.text-red-700]="movimientoEditar.tipo === 'SALIDA'">
-                    {{ movimientoEditar.tipo }}
+                    [class.bg-green-100]="movimientoEditar()?.tipo === 'ENTRADA'"
+                    [class.text-green-700]="movimientoEditar()?.tipo === 'ENTRADA'"
+                    [class.bg-red-100]="movimientoEditar()?.tipo === 'SALIDA'"
+                    [class.text-red-700]="movimientoEditar()?.tipo === 'SALIDA'">
+                    {{ movimientoEditar()?.tipo }}
                 </span>
-                <p class="text-sm font-medium text-gray-700">{{ movimientoEditar.producto?.nombre }}</p>
+                <p class="text-sm font-medium text-gray-700">{{ movimientoEditar()?.producto?.nombre }}</p>
             </div>
         }
         <div>
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                 Cantidad
             </label>
-            <input type="number" [(ngModel)]="cantidadEditada" min="1"
+            <input type="number" [ngModel]="cantidadEditada()" (ngModelChange)="cantidadEditada.set($event)" min="1"
                 class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg
                     focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"/>
         </div>
@@ -268,7 +274,7 @@
     </div>
 </app-modal>
 
-<app-modal titulo="Eliminar movimiento" [abierto]="modalConfirmarAbierto" (cerrar)="cancelarEliminar()">
+<app-modal titulo="Eliminar movimiento" [abierto]="modalConfirmarAbierto()" (cerrar)="cancelarEliminar()">
     <div class="space-y-5">
         <div class="flex items-start gap-3">
             <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">

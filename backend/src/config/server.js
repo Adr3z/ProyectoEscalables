@@ -15,6 +15,7 @@ class Server {
             inventario: '/api/inventario',
             ventas: '/api/ventas',
             usuarios: '/api/usuarios',
+            movimientos: '/api/movimientos',
         };
 
         this.conectarDB();
