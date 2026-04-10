@@ -1,6 +1,6 @@
 const Inventario = require('../models/inventario.model');
 const Producto = require('../models/producto.model');
-const Movimineto = require('../models/movimiento.model');
+const Movimiento = require('../models/movimiento.model');
 
 //Calcular el estao de stock segun los límites del inventario
 const calcularEstado = (stockActual, stockMinimo, stockMaximo) => {
@@ -28,14 +28,18 @@ const getInventario = async (req, res) => {
         });
 
         //Adjuntar el estado calculado a cada registro
-        const resultado = inventario.map((item) => ({
-            ...item.toObject(),
-            estado: calcularEstado(
-                item.productoId.stockActual,
-                item.stockMinimo,
-                item.stockMaximo
-            ),
-        }));
+        const resultado = inventario.map((item) => {
+            const objeto = item.toObject();
+            return {
+                ...objeto,
+                producto: objeto.productoId,
+                estado: calcularEstado(
+                    objeto.productoId.stockActual,
+                    objeto.stockMinimo,
+                    objeto.stockMaximo
+                ),
+            };
+        });
 
         res.status(200).json(resultado);
     }catch (error) {
@@ -62,12 +66,14 @@ const getInventarioById = async(req, res) => {
             });
         }
 
+        const objeto = item.toObject();
         res.json({
-            ...item.toObject(),
+            ...objeto,
+            producto: objeto.productoId,
             estado: calcularEstado(
-                item.productoId.stockActual,
-                item.stockMinimo, 
-                item.stockMaximo
+                objeto.productoId.stockActual,
+                objeto.stockMinimo, 
+                objeto.stockMaximo
             ),
         });
     } catch (error) {
@@ -99,7 +105,7 @@ const registrarEntrada = async (req, res) => {
 
         const inventario = await Inventario.findOne({ productoId });
         if (!inventario) {
-            res.status(404).json({
+            return res.status(404).json({
                 message:' Registro de inventario no encontrado'
             });
         }
@@ -117,7 +123,7 @@ const registrarEntrada = async (req, res) => {
         inventario.fechaActualizacion = Date.now();
         await inventario.save();
 
-        const movimiento = new Movimiento({
+        const movimiento = await new Movimiento({
             tipo: 'ENTRADA',
             productoId,
             cantidad,
@@ -137,9 +143,43 @@ const registrarEntrada = async (req, res) => {
     }
 };
 
+const actualizarInventario = async (req, res) => {
+    try {
+        const { stockMinimo, stockMaximo } = req.body;
+        const inventario = await Inventario.findById(req.params.id);
+
+        if (!inventario) {
+            return res.status(404).json({
+                message: 'Registro de inventario no encontrado'
+            });
+        }
+
+        inventario.stockMinimo = stockMinimo ?? inventario.stockMinimo;
+        inventario.stockMaximo = stockMaximo ?? inventario.stockMaximo;
+        inventario.fechaActualizacion = Date.now();
+
+        const actualizado = await inventario.save();
+        const actualizadoPopulado = await actualizado.populate({
+            path: 'productoId',
+            select: 'nombre precio stockActual',
+            populate: { path: 'categoriaId', select: 'nombre' },
+        });
+
+        const objeto = actualizadoPopulado.toObject();
+        res.json({
+            ...objeto,
+            producto: objeto.productoId,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error al actualizar el inventario', error
+        });
+    }
+};
 
 module.exports = {
     getInventario,
     getInventarioById,
     registrarEntrada,
+    actualizarInventario,
 };

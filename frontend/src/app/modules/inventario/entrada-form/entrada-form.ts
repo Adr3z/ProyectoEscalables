@@ -2,8 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Modal } from '../../../shared/components';
-import { Producto } from '../../../models';
-import { PRODUCTOS_MOCK } from '../../../shared/data/mock.data';
+import { EntradaStockForm, Producto } from '../../../models';
 
 @Component({
   selector: 'app-entrada-form',
@@ -15,19 +14,23 @@ import { PRODUCTOS_MOCK } from '../../../shared/data/mock.data';
 
 export class EntradaForm implements OnChanges {
   @Input()  abierto = false;
+  @Input()  productos: Producto[] = [];
   @Output() cerrar  = new EventEmitter<void>();
+  @Output() guardar = new EventEmitter<EntradaStockForm>();
 
-  productos: Producto[] = PRODUCTOS_MOCK;
-
-  form: { productoId: string; cantidad: number | null; notas: string } = {
+  form: EntradaStockForm = {
     productoId: '',
-    cantidad:   null,
-    notas:      ''
+    cantidad: 0,
+    notas: ''
   };
 
   ngOnChanges(): void {
     if (!this.abierto) {
-      this.form = { productoId: '', cantidad: null, notas: '' };
+      this.form = {
+        productoId: '',
+        cantidad: 0,
+        notas: ''
+      };
     }
   }
 
@@ -41,8 +44,17 @@ export class EntradaForm implements OnChanges {
     }
   }
 
-  guardar(): void {
-    // Aquí irá la llamada al servicio
+  guardarModal(): void {
+    if (!this.form.productoId || !(this.form.cantidad > 0)) {
+      this.cerrar.emit();
+      return;
+    }
+
+    this.guardar.emit({
+      productoId: this.form.productoId,
+      cantidad: this.form.cantidad,
+      notas: this.form.notas,
+    });
     this.cerrar.emit();
   }
 }

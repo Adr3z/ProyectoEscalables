@@ -21,4 +21,9 @@ export class InventarioService {
     registrarEntrada(data: EntradaStockForm) {
         return this.http.post(this.API + '/entrada', data);
     }
+
+    //Actualizar límites del inventario
+    updateInventario(id: string, data: { stockMinimo: number; stockMaximo: number }) {
+        return this.http.put<Inventario>(`${this.API}/${id}`, data);
+    }
 }

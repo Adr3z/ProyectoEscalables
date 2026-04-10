@@ -26,16 +26,16 @@
 
         <div (click)="filtrarStockBajo()"
         class="rounded-xl border p-4 cursor-pointer transition"
-        [class.bg-orange-50]="filtroStockBajoActivo" [class.border-orange-300]="filtroStockBajoActivo"
-        [class.bg-white]="!filtroStockBajoActivo" [class.border-gray-200]="!filtroStockBajoActivo">
+        [class.bg-orange-50]="filtroStockBajoActivo()" [class.border-orange-300]="filtroStockBajoActivo()"
+        [class.bg-white]="!filtroStockBajoActivo()" [class.border-gray-200]="!filtroStockBajoActivo()">
             <p class="text-xs text-gray-400 font-medium uppercase tracking-wide">Stock Bajo / Crítico</p>
             <p class="text-2xl font-bold text-red-500 mt-1">{{ stockBajo }}</p>
         </div>
 
         <div (click)="filtrarAgotados()"
         class="rounded-xl border p-4 cursor-pointer transition"
-        [class.bg-pink-50]="filtroAgotadosActivo" [class.border-pink-300]="filtroAgotadosActivo"
-        [class.bg-white]="!filtroAgotadosActivo" [class.border-gray-200]="!filtroAgotadosActivo">
+        [class.bg-pink-50]="filtroAgotadosActivo()" [class.border-pink-300]="filtroAgotadosActivo()"
+        [class.bg-white]="!filtroAgotadosActivo()" [class.border-gray-200]="!filtroAgotadosActivo()">
             <p class="text-xs text-gray-400 font-medium uppercase tracking-wide">Agotados</p>
             <p class="text-2xl font-bold text-gray-500 mt-1">{{ productosAgotados }}</p>
         </div>
@@ -78,7 +78,7 @@
 
                                 <div>
                                     <p class="font-medium text-gray-800">{{ item.producto?.nombre }}</p>
-                                    <p class="text-xs text-gray-400 mt-0.5">{{ item.producto?.categoria?.nombre }}</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">{{ item.producto?.categoriaId?.nombre }}</p>
                                 </div>
                             </div>
                         </td>
@@ -122,8 +122,8 @@
         </table>
 
         <div class="px-5 py-3 border-t border-gray-100">
-            <app-paginacion [total]="inventarioFiltrado.length" [porPagina]="porPagina"
-            [paginaActual]="paginaActual" (paginaCambia)="cambiarPagina($event)"/>
+            <app-paginacion [total]="inventarioFiltrado.length" [porPagina]="porPagina()"
+            [paginaActual]="paginaActual()" (paginaCambia)="cambiarPagina($event)"/>
         </div>
     </div>
 
@@ -145,7 +145,7 @@
 
                         <div class="min-w-0">
                             <p class="font-medium text-gray-800 text-sm truncate">{{ item.producto?.nombre }}</p>
-                            <p class="text-xs text-gray-400">{{ item.producto?.categoria?.nombre }}</p>
+                            <p class="text-xs text-gray-400">{{ item.producto?.categoriaId?.nombre }}</p>
                         </div>
                     </div>
 
@@ -184,15 +184,16 @@
         }
 
         <div class="px-5 py-3">
-            <app-paginacion [total]="inventarioFiltrado.length" [porPagina]="porPagina"
-            [paginaActual]="paginaActual" (paginaCambia)="cambiarPagina($event)"/>
+            <app-paginacion [total]="inventarioFiltrado.length" [porPagina]="porPagina()"
+            [paginaActual]="paginaActual()" (paginaCambia)="cambiarPagina($event)"/>
         </div>
     </div>
 
 </div>
 
 <!-- Modales sin cambios -->
-<app-entrada-form [abierto]="modalEntradaAbierto" (cerrar)="cerrarEntrada()"/>
+    <app-entrada-form [abierto]="modalEntradaAbierto()" [productos]="productos()"
+        (cerrar)="cerrarEntrada()" (guardar)="guardarEntrada($event)"/>
 
-<app-stock-form [abierto]="modalStockAbierto" [inventario]="inventarioEditar"
+<app-stock-form [abierto]="modalStockAbierto()" [inventario]="inventarioEditar()"
     (cerrar)="cerrarStock()" (guardar)="guardarStock($event)"/>

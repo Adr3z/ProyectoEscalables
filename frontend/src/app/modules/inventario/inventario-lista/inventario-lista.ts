@@ -1,15 +1,16 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, effect, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BadgeStock, Paginacion } from '../../../shared/components';
 import { EntradaForm } from '../entrada-form/entrada-form';
-import { Inventario, EstadoStock } from '../../../models';
-import { PRODUCTOS_MOCK } from '../../../shared/data/mock.data';
+import { Inventario, EstadoStock, EntradaStockForm, Producto } from '../../../models';
 import { getEstadoStock } from '../../../shared/utils/stock.utils';
 import { StockForm } from '../stock-form/stock-form';
 
 //Busqueda
 import { Subscription } from 'rxjs';
 import { BusquedaService } from '../../../core/services/busqueda.service';
+import { ProductoService } from '../../../core/services/producto.service';
+import { InventarioService } from '../../../core/services/inventario.service';
 
 @Component({
   selector: 'app-inventario-lista',
@@ -21,43 +22,72 @@ import { BusquedaService } from '../../../core/services/busqueda.service';
 
 export class InventarioLista implements OnInit, OnDestroy {
 
-  modalEntradaAbierto  = false;
-  modalStockAbierto = false;
-  inventarioEditar: Inventario | null = null;
-  paginaActual  = 1;
-  porPagina     = 5;
+  modalEntradaAbierto  = signal(false);
+  modalStockAbierto = signal(false);
+  inventarioEditar = signal<Inventario | null>(null);
+  paginaActual  = signal(1);
+  porPagina     = signal(5);
 
-  inventario: Inventario[] = PRODUCTOS_MOCK.map((p, i) => ({
-    _id:                `inv-${i + 1}`,
-    productoId:         p._id,
-    producto:           p,
-    stockMinimo:        5,
-    stockMaximo:        50,
-    fechaActualizacion: new Date()
-  }));
+  productos = signal<Producto[]>([]);
+  inventario = signal<Inventario[]>([]);
+  inventarioFiltradoSignal = signal<Inventario[]>([]);
 
   //busqueda
-  terminoBusqueda = '';
+  terminoBusqueda = signal('');
+  filtroAgotadosActivo = signal(false);
+  filtroStockBajoActivo = signal(false);
   private sub!: Subscription;
 
-  constructor(private busquedaService: BusquedaService) {}
+  constructor(
+    private busquedaService: BusquedaService,
+    private productoService: ProductoService,
+    private inventarioService: InventarioService,
+  ) {}
+
+  private filtrosEffect = effect(() => {
+    const busqueda = this.terminoBusqueda().trim().toLowerCase();
+    let lista = this.inventario();
+
+    if (busqueda) {
+      lista = lista.filter(i =>
+        i.producto?.nombre.toLowerCase().includes(busqueda) ||
+        i.producto?.categoriaId?.nombre.toLowerCase().includes(busqueda)
+      );
+    }
+
+    if (this.filtroStockBajoActivo()) {
+      lista = lista.filter(i => {
+        const estado = this.getEstado(i);
+        return estado === 'BAJO' || estado === 'CRITICO';
+      });
+    }
+
+    if (this.filtroAgotadosActivo()) {
+      lista = lista.filter(i => this.getEstado(i) === 'AGOTADO');
+    }
+
+    this.inventarioFiltradoSignal.set(lista);
+  });
 
   ngOnInit(): void {
     this.sub = this.busquedaService.termino$.subscribe(t => {
-      this.terminoBusqueda = t;
-      this.paginaActual    = 1;
+      this.terminoBusqueda.set(t);
+      this.paginaActual.set(1);
     });
+
+    this.loadProductos();
+    this.loadInventario();
   }
 
   ngOnDestroy(): void { this.sub.unsubscribe(); }
 
   //Stats
   get skusActivos(): number { 
-    return this.inventario.length; 
+    return this.inventario().length; 
   }
 
   get stockBajo(): number { 
-    return this.inventario.filter(i => this.getEstado(i) === 'BAJO' || this.getEstado(i) === 'CRITICO').length; 
+    return this.inventario().filter(i => this.getEstado(i) === 'BAJO' || this.getEstado(i) === 'CRITICO').length; 
   }
 
   get movimientosHoy(): number { 
@@ -65,100 +95,108 @@ export class InventarioLista implements OnInit, OnDestroy {
   }
 
   get productosAgotados(): number {
-    return this.inventario.filter(i => this.getEstado(i) === 'AGOTADO').length;
+    return this.inventario().filter(i => this.getEstado(i) === 'AGOTADO').length;
   }
 
   //Paginación
   get inventarioPaginado(): Inventario[] {
-    const inicio = (this.paginaActual - 1) * this.porPagina;
-    return this.inventarioFiltrado.slice(inicio, inicio + this.porPagina);
+    const inicio = (this.paginaActual() - 1) * this.porPagina();
+    return this.inventarioFiltrado.slice(inicio, inicio + this.porPagina());
   }
 
   cambiarPagina(pagina: number): void { 
-    this.paginaActual = pagina; 
+    this.paginaActual.set(pagina); 
   }
 
   getEstado(item: Inventario): EstadoStock {
     return getEstadoStock(item.producto?.stockActual ?? 0, item.stockMinimo);
   }
 
+  private loadProductos(): void {
+    this.productoService.getProductos().subscribe({
+      next: productos => this.productos.set(productos),
+      error: () => this.productos.set([]),
+    });
+  }
+
+  private loadInventario(): void {
+    this.inventarioService.getInventario().subscribe({
+      next: inventario => this.inventario.set(inventario),
+      error: () => this.inventario.set([]),
+    });
+  }
+
+  guardarEntrada(form: EntradaStockForm): void {
+    this.inventarioService.registrarEntrada(form).subscribe({
+      next: () => {
+        this.loadInventario();
+        this.cerrarEntrada();
+      },
+      error: () => {
+        this.loadInventario();
+        this.cerrarEntrada();
+      },
+    });
+  }
+
   abrirEntrada(): void  { 
-    this.modalEntradaAbierto = true; 
+    this.modalEntradaAbierto.set(true); 
   }
 
   cerrarEntrada(): void { 
-    this.modalEntradaAbierto = false; 
+    this.modalEntradaAbierto.set(false); 
   }
 
   abrirEditarStock(item: Inventario): void {
-    this.inventarioEditar = item;
-    this.modalStockAbierto = true;
+    this.inventarioEditar.set(item);
+    this.modalStockAbierto.set(true);
   }
 
   cerrarStock(): void {
-    this.modalStockAbierto = false;
+    this.modalStockAbierto.set(false);
   }
 
   guardarStock(valores: { stockMinimo: number; stockMaximo: number }): void {
-    if (this.inventarioEditar) {
-      this.inventario = this.inventario.map(i =>
-        i._id === this.inventarioEditar!._id
-          ? { ...i, ...valores, fechaActualizacion: new Date() }
-          : i
-      );
+    const registro = this.inventarioEditar();
+    if (!registro) {
+      return;
     }
-    this.inventarioEditar = null;
+
+    this.inventarioService.updateInventario(registro._id, valores).subscribe({
+      next: updated => {
+        this.inventario.set(this.inventario().map(i =>
+          i._id === updated._id ? updated : i
+        ));
+        this.inventarioEditar.set(null);
+      },
+      error: () => {
+        this.inventarioEditar.set(null);
+      }
+    });
   }
 
   //Filtros
-  filtroAgotadosActivo = false;
-  filtroStockBajoActivo = false;
-
   filtrarStockBajo(): void {
-    this.filtroStockBajoActivo = !this.filtroStockBajoActivo;
-    if (this.filtroStockBajoActivo) {
-      this.filtroAgotadosActivo = false;
+    this.filtroStockBajoActivo.set(!this.filtroStockBajoActivo());
+    if (this.filtroStockBajoActivo()) {
+      this.filtroAgotadosActivo.set(false);
     }
 
-    this.paginaActual = 1;
+    this.paginaActual.set(1);
   }
 
   filtrarAgotados(): void {
-    this.filtroAgotadosActivo = !this.filtroAgotadosActivo;
+    this.filtroAgotadosActivo.set(!this.filtroAgotadosActivo());
 
-    if (this.filtroAgotadosActivo) {
-      this.filtroStockBajoActivo = false;
+    if (this.filtroAgotadosActivo()) {
+      this.filtroStockBajoActivo.set(false);
     }
 
-    this.paginaActual = 1;
+    this.paginaActual.set(1);
   }
 
   get inventarioFiltrado(): Inventario[] {
-    let resultado = this.inventario;
-
-    //búsqueda
-    if (this.terminoBusqueda.trim()) {
-      const q = this.terminoBusqueda.toLowerCase();
-      resultado = resultado.filter(i =>
-        i.producto?.nombre.toLowerCase().includes(q) ||
-        i.producto?.categoria?.nombre.toLowerCase().includes(q)
-      );
-    }
-
-    //filtro stock bajo/crítico
-    if (this.filtroStockBajoActivo) {
-      resultado = resultado.filter(i => {
-        const estado = this.getEstado(i);
-        return estado === 'BAJO' || estado === 'CRITICO';
-      });
-    }
-
-    //filtro agotados
-    if (this.filtroAgotadosActivo) {
-      resultado = resultado.filter(i => this.getEstado(i) === 'AGOTADO');
-    }
-
-    return resultado;
+    return this.inventarioFiltradoSignal();
   }
 
 }
