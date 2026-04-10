@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, isDevMode, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Modal } from '../../../shared/components';
-import { Producto, Categoria } from '../../../models';
-import { CATEGORIAS_PRINCIPALES, SUBCATEGORIAS_PASTELES } from '../../../shared/data/mock.data';
+import { Producto, Categoria, ProductoForm } from '../../../models';
+import { CategoriaService } from '../../../core/services/categoria.service';
+import { ProductoService } from '../../../core/services/producto.service';
 
 @Component({
   selector: 'app-catalogo-form',
@@ -17,9 +18,10 @@ export class CatalogoForm implements OnChanges {
   @Input()  abierto  = false;
   @Input()  producto: Producto | null = null;
   @Output() cerrar   = new EventEmitter<void>();
+  @Output() guardado = new EventEmitter<void>();
 
-  categoriasPrincipales: Categoria[] = CATEGORIAS_PRINCIPALES;
-  subcategoriasPasteles: Categoria[] = SUBCATEGORIAS_PASTELES;
+  categoriasPrincipales: Categoria[] = [];
+  subcategorias: Categoria[] = [];
 
   form: {
     nombre:       string;
@@ -37,26 +39,49 @@ export class CatalogoForm implements OnChanges {
   get titulo(): string { return this.producto ? 'Editar producto' : 'Crear nuevo producto'; }
   get esEdicion(): boolean { return !!this.producto; }
 
-  get mostrarSubcategorias(): boolean {
-    return this.form.categoriaId === 'c1' ||
-      this.subcategoriasPasteles.some(s => s._id === this.form.categoriaId);
+  get categoriaPrincipalSeleccionadaId(): string {
+    const categoriaPrincipal = this.categoriasPrincipales.find(c => c._id === this.form.categoriaId);
+    if (categoriaPrincipal) {
+      return categoriaPrincipal._id;
+    }
+
+    const subcategoria = this.subcategorias.find(s => s._id === this.form.categoriaId);
+    return subcategoria?.padreId ?? '';
   }
 
+  get mostrarSubcategorias(): boolean {
+    return !!this.categoriaPrincipalSeleccionadaId
+      && this.subcategorias.some(s => s.padreId === this.categoriaPrincipalSeleccionadaId);
+  }
+
+  get subcategoriasSeleccionadas(): Categoria[] {
+    return this.subcategorias.filter(s => s.padreId === this.categoriaPrincipalSeleccionadaId);
+  }
+
+  constructor(
+    private categoriaService: CategoriaService,
+    private productoService: ProductoService,
+  ) {}
+
   ngOnChanges(): void {
+    if (this.abierto) {
+      this.loadCategorias();
+    }
+
     if (this.producto) {
       this.form = {
         nombre:      this.producto.nombre,
         precio:      this.producto.precio,
-        categoriaId: this.producto.categoriaId,
+        categoriaId: this.producto.categoriaId._id,
         descripcion: this.producto.descripcion ?? '',
         stockMinimo: null,
         stockMaximo: null,
       };
     } else {
-      this.form = { 
-        nombre: '', 
-        precio: null, 
-        categoriaId: '', 
+      this.form = {
+        nombre: '',
+        precio: null,
+        categoriaId: '',
         descripcion: '',
         stockMinimo: null,
         stockMaximo: null,
@@ -64,12 +89,45 @@ export class CatalogoForm implements OnChanges {
     }
   }
 
-  seleccionarCategoriaPrincipal(id: string): void{
+  private loadCategorias(): void {
+    this.categoriaService.getCategorias().subscribe({
+      next: categorias => {
+        this.categoriasPrincipales = categorias.filter(c => !c.padreId);
+        this.subcategorias = categorias.filter(c => !!c.padreId);
+      },
+      error: () => {
+        this.categoriasPrincipales = [];
+        this.subcategorias = [];
+      }
+    });
+  }
+
+  seleccionarCategoriaPrincipal(id: string): void {
     this.form.categoriaId = id;
   }
 
   guardar(): void {
-    //Aquí irá la llamada al servicio 
-    this.cerrar.emit();
+    const payload = {
+      nombre: this.form.nombre.trim(),
+      precio: this.form.precio ?? 0,
+      categoriaId: this.form.categoriaId,
+      descripcion: this.form.descripcion?.trim() || undefined,
+      ...(this.form.stockMinimo != null && { stockMinimo: this.form.stockMinimo }),
+      ...(this.form.stockMaximo != null && { stockMaximo: this.form.stockMaximo }),
+    } as ProductoForm & { stockMinimo?: number; stockMaximo?: number };
+
+    const request = this.esEdicion
+      ? this.productoService.updateProducto(this.producto!._id, payload)
+      : this.productoService.createProducto(payload);
+
+    request.subscribe({
+      next: () => {
+        this.cerrar.emit();
+        this.guardado.emit();
+      },
+      error: () => {
+        this.cerrar.emit();
+      }
+    });
   }
 }

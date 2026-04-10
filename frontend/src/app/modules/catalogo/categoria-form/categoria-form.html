@@ -22,13 +22,14 @@
             </label>
 
             <select
+                name="padreId"
                 [(ngModel)]="form.padreId"
                 class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-white
                     focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent" >
 
                 <option value="">Ninguna — categoría principal</option>
 
-                @for (cat of categoriasPrincipales; track cat._id) {
+                @for (cat of categoriasPrincipales(); track cat._id) {
                     <option [value]="cat._id">{{ cat.nombre }}</option>
                 }
             </select>

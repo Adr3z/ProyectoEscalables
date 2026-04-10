@@ -7,8 +7,10 @@ export interface Producto {
   nombre: string;
   descripcion?: string;
   precio: number;
-  categoriaId: string;
-  categoria?: Categoria;
+  categoriaId: {
+    _id: string;
+    nombre: string;
+  };
   stockActual: number;
 }
 

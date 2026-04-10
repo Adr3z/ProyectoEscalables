@@ -38,8 +38,9 @@ const getCategoriaById = async (req, res) => {
 //Crear una nueva categoría
 const createCategoria = async (req, res) => {
     try {
-        const { nombre, descripcion } = req.body;
-        const categoria = new Categoria( { nombre, descripcion});
+        const { nombre, descripcion, padreId: rawPadreId } = req.body;
+        const padreId = typeof rawPadreId === 'string' ? rawPadreId.trim() : rawPadreId;
+        const categoria = new Categoria({ nombre, descripcion, padreId: padreId || null });
 
         await categoria.save();
         res.status(201).json(categoria);
@@ -61,11 +62,12 @@ const createCategoria = async (req, res) => {
 //Actualizar una categoria
 const updateCategoria = async (req, res) => {
     try {
-        const { nombre, descripcion } = req.body;
+        const { nombre, descripcion, padreId: rawPadreId } = req.body;
+        const padreId = typeof rawPadreId === 'string' ? rawPadreId.trim() : rawPadreId;
         const categoria = await Categoria.findByIdAndUpdate(
             req.params.id,
-            {nombre, descripcion},
-            { new: true, runValidators: true}
+            { nombre, descripcion, padreId: padreId || null },
+            { returnDocument: 'after' }
         );
 
         if (!categoria) {

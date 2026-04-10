@@ -5,7 +5,7 @@ const Inventario = require('../models/inventario.model');
 //Obtener todos los productos
 const getProductos = async( req, res) => {
     try {
-        const productos = await Producto.find().populate('categoriaId', 'nombre');
+        const productos = await Producto.find().populate('categoriaId', 'nombre padreId');
         res.status(200).json(productos);
     }catch (error) {
         res.status(500).json({
@@ -19,7 +19,7 @@ const getProductos = async( req, res) => {
 //Obtener un producto
 const getProductoById = async (req, res) => {
     try {
-        const producto = await Producto.findById(req.params.id).populate('categoriaId', 'nombre');
+        const producto = await Producto.findById(req.params.id).populate('categoriaId', 'nombre padreId');
         if(!producto) {
             return res.status(404).json({
                 message: 'Producto no encontrado'
@@ -38,7 +38,9 @@ const getProductoById = async (req, res) => {
 //Obtener productos para el catalogo publico
 const getProductosPublicos = async( req, res) => {
     try {
-        const productos = await Producto.find({ stockActual: { $gt: 0} }).populate('categoriaId', 'nombre descripcion').select('nombre descripcion precio categoriaId stockActual');
+        const productos = await Producto.find({ stockActual: { $gt: 0} })
+          .populate('categoriaId', 'nombre padreId descripcion')
+          .select('nombre descripcion precio categoriaId stockActual');
         res.status(200).json(productos);
     }catch (error) {
         res.status(500).json({
@@ -104,7 +106,7 @@ const updateProducto = async (req, res) => {
         const producto = await Producto.findByIdAndUpdate(
             req.params.id,
             { nombre, descripcion, precio, categoriaId },
-            { new: true, runValidators: true}
+            { returnDocument: 'after'}
         ).populate('categoriaId', 'nombre');
 
         if(!producto) {

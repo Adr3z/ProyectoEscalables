@@ -3,6 +3,11 @@ import { HttpClient } from "@angular/common/http";
 import { environment } from "../../../env";
 import { Producto, ProductoForm } from "../../models";
 
+type ProductoRequest = ProductoForm & {
+    stockMinimo?: number;
+    stockMaximo?: number;
+};
+
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
     private http = inject(HttpClient);
@@ -22,12 +27,12 @@ export class ProductoService {
     }
 
     //Crear producto
-    createProducto(form: ProductoForm) {
+    createProducto(form: ProductoRequest) {
         return this.http.post<Producto>(this.API, form);
     }
 
     //Editar producto
-    updateProducto(id: string, form: ProductoForm) {
+    updateProducto(id: string, form: ProductoRequest) {
         return this.http.put<Producto>(`${this.API}/${id}`, form);
     }
 
