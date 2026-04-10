@@ -209,17 +209,17 @@ export class CatalogoLista implements OnInit, OnDestroy {
   estaActiva(id: string): boolean {
     const activa = this.categoriaActivaId();
 
-  if (!activa) return false;
+    if (!activa) return false;
 
-  if (activa === id) return true;
+    if (activa === id) return true;
 
-  const sub = this.subcategoriasPasteles().find(s => s._id === activa);
+    const sub = this.subcategoriasPasteles().find(s => s._id === activa);
 
-  if (sub && sub.padreId === id) {
-    return true;
-  }
+    if (sub && sub.padreId === id) {
+      return true;
+    }
 
-  return false;
+    return false;
   }
 
   // ── Acciones Productos ─────────────────────────────────

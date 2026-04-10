@@ -7,15 +7,15 @@
                 <button
                 (click)="limpiarFiltro()"
                 class="px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
-                [class.bg-red-500]="!categoriaActivaId"
-                [class.text-white]="!categoriaActivaId"
-                [class.border-red-500]="!categoriaActivaId"
-                [class.border-gray-200]="!!categoriaActivaId"
-                [class.text-gray-600]="!!categoriaActivaId">
+                [class.bg-red-500]="!categoriaPrincipalActivaId()"
+                [class.text-white]="!categoriaPrincipalActivaId()"
+                [class.border-red-500]="!categoriaPrincipalActivaId()"
+                [class.border-gray-200]="!!categoriaPrincipalActivaId"
+                [class.text-gray-600]="!!categoriaPrincipalActivaId">
                     Todos
                 </button>
 
-                @for (cat of categoriasPrincipales; track cat._id) {
+                @for (cat of categoriasPrincipales(); track cat._id) {
                     <button
                         (click)="seleccionarPrincipal(cat)"
                         class="px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex items-center gap-1"
@@ -27,10 +27,10 @@
 
                         {{ cat.nombre }}
                         
-                        @if (cat._id === 'c1') {
+                        @if (tieneSubcategorias(cat)) {
                             <svg class="w-3 h-3 transition-transform"
-                                [class.rotate-180]="mostrarSubcategorias"
-                                f ill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                [class.rotate-180]="estaActiva(cat._id)"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         }
@@ -40,7 +40,7 @@
 
             @if (mostrarSubcategorias) {
                 <div class="flex items-center gap-2 flex-wrap pl-4 border-l-2 border-red-200">
-                    @for (sub of subcategoriasPasteles; track sub._id) {
+                    @for (sub of subcategoriasActivas; track sub._id) {
                         <button
                         (click)="seleccionarSubcategoria(sub)"
                         class="px-3 py-1 rounded-full text-xs font-medium border transition-colors"
@@ -83,7 +83,7 @@
     <!-- Panel derecho: carrito escritorio-->
     <div class="hidden lg:flex lg:w-72 shrink-0 flex-col">
         <app-carrito
-        [items]="carrito"
+        [items]="carrito()"
         (incrementar)="incrementar($event)"
         (decrementar)="decrementar($event)"
         (eliminar)="eliminarDelCarrito($event)"
@@ -117,14 +117,14 @@
     }
     
     <svg class="w-4 h-4 ml-0.5 transition-transform duration-200"
-        [class.rotate-180]="carritoVisible"
+        [class.rotate-180]="carritoVisible()"
         fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
     </svg>
 </button>
 
 <!-- Overlay -->
-@if (carritoVisible) {
+@if (carritoVisible()) {
     <div (click)="toggleCarrito()"
         class="lg:hidden fixed inset-0 bg-black/40 z-30">
     </div>
@@ -134,8 +134,8 @@
 <div
     class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white rounded-t-2xl shadow-2xl
             transform transition-transform duration-300 ease-in-out flex flex-col"
-    [class.translate-y-0]="carritoVisible"
-    [class.translate-y-full]="!carritoVisible"
+    [class.translate-y-0]="carritoVisible()"
+    [class.translate-y-full]="!carritoVisible()"
     style="max-height: 80vh;">
     
     <!-- Handle -->
@@ -164,7 +164,7 @@
     <!-- Contenido scrollable -->
     <div class="overflow-y-auto flex-1">
         <app-carrito
-        [items]="carrito"
+        [items]="carrito()"
         (incrementar)="incrementar($event)"
         (decrementar)="decrementar($event)"
         (eliminar)="eliminarDelCarrito($event)"
@@ -175,7 +175,7 @@
 
 
 <!-- Toast venta confirmada -->
-@if (ventaConfirmada) {
+@if (ventaConfirmada()) {
     <div class="fixed bottom-24 right-5 lg:bottom-6 lg:right-6 bg-green-500 text-white px-5 py-3 rounded-xl shadow-lg
                 flex items-center gap-2 text-sm font-medium z-50">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -186,7 +186,7 @@
 }
 
 <!-- Modal confirmar venta con validación -->
-<app-modal titulo="Confirmar venta" [abierto]="modalConfirmarAbierto" (cerrar)="cerrarConfirmar()">
+<app-modal titulo="Confirmar venta" [abierto]="modalConfirmarAbierto()" (cerrar)="cerrarConfirmar()">
     <div class="space-y-4">
         <!-- Lista de items con estado -->
         <div class="space-y-2">
