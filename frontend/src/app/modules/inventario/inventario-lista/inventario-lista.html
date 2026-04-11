@@ -192,7 +192,7 @@
 </div>
 
 <!-- Modales sin cambios -->
-    <app-entrada-form [abierto]="modalEntradaAbierto()" [productos]="productos()"
+    <app-entrada-form [abierto]="modalEntradaAbierto()" [productos]="productos()" [mensajeError]="mensajeEntradaError()"
         (cerrar)="cerrarEntrada()" (guardar)="guardarEntrada($event)"/>
 
 <app-stock-form [abierto]="modalStockAbierto()" [inventario]="inventarioEditar()"

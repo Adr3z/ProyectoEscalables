@@ -26,6 +26,7 @@ import { MovimientoService } from '../../../core/services/movimiento.service';
 export class InventarioLista implements OnInit, OnDestroy {
 
   modalEntradaAbierto  = signal(false);
+  mensajeEntradaError = signal<string | null>(null);
   modalStockAbierto = signal(false);
   inventarioEditar = signal<Inventario | null>(null);
   paginaActual  = signal(1);
@@ -158,21 +159,24 @@ export class InventarioLista implements OnInit, OnDestroy {
     this.inventarioService.registrarEntrada(form).subscribe({
       next: () => {
         this.loadInventario();
+        this.mensajeEntradaError.set(null);
         this.cerrarEntrada();
       },
-      error: () => {
-        this.loadInventario();
-        this.cerrarEntrada();
+      error: (err: any) => {
+        const mensaje = err?.error?.message ?? 'No fue posible registrar la entrada.';
+        this.mensajeEntradaError.set(mensaje);
       },
     });
   }
 
   abrirEntrada(): void  { 
+    this.mensajeEntradaError.set(null);
     this.modalEntradaAbierto.set(true); 
   }
 
   cerrarEntrada(): void { 
     this.modalEntradaAbierto.set(false); 
+    this.mensajeEntradaError.set(null);
   }
 
   abrirEditarStock(item: Inventario): void {

@@ -59,6 +59,13 @@
             <p class="text-xs text-gray-400 mt-1.5">La cantidad se sumará directamente al stock actual.</p>
         </div>
 
+        <!-- Mensaje de error -->
+        @if (errorMessage) {
+            <div class="p-3 mb-4 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                {{ errorMessage }}
+            </div>
+        }
+
         <!-- Notas -->
         <div>
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
