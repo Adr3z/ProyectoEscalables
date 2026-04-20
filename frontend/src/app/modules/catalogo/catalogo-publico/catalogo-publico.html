@@ -40,23 +40,25 @@
             <button
                 (click)="limpiarFiltro()"
                 class="px-4 py-2 rounded-full text-sm font-medium border transition-colors"
-                [class.bg-red-500]="!categoriaActivaId()"
-                [class.text-white]="!categoriaActivaId()"
-                [class.border-red-500]="!categoriaActivaId()"
-                [class.border-gray-200]="!!categoriaActivaId()"
-                [class.text-gray-600]="!!categoriaActivaId()" >
+                [class.bg-red-500]="!categoriaActivaId() && !padreActivoId()"
+                [class.text-white]="!categoriaActivaId() && !padreActivoId()"
+                [class.border-red-500]="!categoriaActivaId() && !padreActivoId()"
+                [class.border-gray-200]="!!categoriaActivaId() || !!padreActivoId()"
+                [class.text-gray-600]="!!categoriaActivaId() || !!padreActivoId()" >
                 Todos
             </button>
 
             @for (cat of categoriasPrincipales; track cat._id) {
                 <button
-                (click)="seleccionarPrincipal(cat)"
-                class="px-4 py-2 rounded-full text-sm font-medium border transition-colors flex items-center gap-1"
-                [class.bg-red-500]="estaActiva(cat._id)"
-                [class.text-white]="estaActiva(cat._id)"
-                [class.border-red-500]="estaActiva(cat._id)"
-                [class.border-gray-200]="!estaActiva(cat._id)"
-                [class.text-gray-600]="!estaActiva(cat._id)" >
+                    (click)="seleccionarPrincipal(cat)"
+                    class="px-4 py-2 rounded-full text-sm font-medium border transition-colors flex items-center gap-1 cursor-pointer"
+                    [class.bg-red-500]="estaActiva(cat._id)"
+                    [class.text-white]="estaActiva(cat._id)"
+                    [class.border-red-500]="estaActiva(cat._id)"
+                    [class.hover:bg-red-600]="estaActiva(cat._id)"
+                    [class.border-gray-200]="!estaActiva(cat._id)"
+                    [class.text-gray-600]="!estaActiva(cat._id)"
+                    [class.hover:bg-gray-100]="!estaActiva(cat._id)">
 
                 {{ cat.nombre }}
 
@@ -78,7 +80,9 @@
                 @for (sub of subcategoriasVisibles; track sub._id) {
                     <button
                         (click)="seleccionarSubcategoria(sub)"
-                        class="px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
+                        class="px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer"
+                        [class.hover:bg-red-200]="estaActiva(sub._id)"
+                        [class.hover:bg-gray-100]="!estaActiva(sub._id)"
                         [class.bg-red-100]="estaActiva(sub._id)"
                         [class.text-red-700]="estaActiva(sub._id)"
                         [class.border-red-300]="estaActiva(sub._id)"

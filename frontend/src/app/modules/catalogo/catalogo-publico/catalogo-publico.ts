@@ -84,7 +84,14 @@ export class CatalogoPublico implements OnInit {
   }
 
   seleccionarSubcategoria(sub: Categoria): void {
-    this.categoriaActivaId.set(this.categoriaActivaId() === sub._id ? null : sub._id);
+    if (this.categoriaActivaId() === sub._id) {
+      // Deselecting
+      this.categoriaActivaId.set(null);
+      this.padreActivoId.set(null); // Limpiar el filtro padre también
+    } else {
+      this.categoriaActivaId.set(sub._id);
+    }
+    this.termino.set(''); // Limpiar el término de búsqueda
     this.aplicarFiltros();
   }
 
