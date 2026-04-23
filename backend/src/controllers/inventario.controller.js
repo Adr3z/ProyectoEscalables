@@ -10,7 +10,7 @@ const calcularEstado = (stockActual, stockMinimo, stockMaximo) => {
     if (stockActual <= stockMinimo) {
         return 'CRITICO';
     }  
-    if (stockActual <= stockMinimo * 1.5) {
+    if (stockActual <= stockMinimo * 1.2) {
         return 'BAJO';
     }
     return 'SUFICIENTE';
@@ -143,6 +143,67 @@ const registrarEntrada = async (req, res) => {
     }
 };
 
+//POST /api/inventario/salida
+//Registrar una salida de producto del inventario
+const registrarSalida = async (req, res) => {
+    try {
+        const {productoId, cantidad, notas, usuarioId } = req.body;
+
+        if( cantidad <= 0) {
+            return res.status(400).json({
+                message: 'La cantidad debe ser mayor a cero'
+            });
+        }
+
+        const producto = await Producto.findById(productoId);
+        if (!producto){
+            return res.status(404).json({
+                message: 'Producto no encontrado'
+            });
+        }
+
+        const inventario = await Inventario.findOne({ productoId });
+        if (!inventario) {
+            return res.status(404).json({
+                message:' Registro de inventario no encontrado'
+            });
+        }
+
+        if (producto.stockActual < cantidad) {
+            return res.status(400).json({
+                message: 'No hay suficiente stock para realizar la salida'
+            });
+        }
+
+        const nuevoStock = producto.stockActual - cantidad;
+        producto.stockActual = nuevoStock;
+        await producto.save();
+
+        inventario.fechaActualizacion = Date.now();
+        await inventario.save();
+
+        const movimiento = await new Movimiento({
+            tipo: 'SALIDA',
+            productoId,
+            cantidad,
+            usuarioId,
+            notas
+        }).save();
+
+        res.status(201).json({
+            message: 'Salida registrada correctamente',
+            stockActual: producto.stockActual,
+            movimiento,
+        });
+    }catch (error){
+        res.status(500).json({
+            message: 'Error al registrar la salida', error
+        });
+    }
+};
+
+//PUT /api/inventario/:id
+//Actualizar límites del inventario
 const actualizarInventario = async (req, res) => {
     try {
         const { stockMinimo, stockMaximo } = req.body;
@@ -181,5 +242,6 @@ module.exports = {
     getInventario,
     getInventarioById,
     registrarEntrada,
+    registrarSalida,
     actualizarInventario,
 };

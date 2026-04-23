@@ -151,14 +151,15 @@ export class InventarioLista implements OnInit, OnDestroy {
 
   private esMismoDia(fecha: Date, hoy: Date): boolean {
     return fecha.getFullYear() === hoy.getFullYear() &&
-           fecha.getMonth() === hoy.getMonth() &&
-           fecha.getDate() === hoy.getDate();
+        fecha.getMonth() === hoy.getMonth() &&
+        fecha.getDate() === hoy.getDate();
   }
 
   guardarEntrada(form: EntradaStockForm): void {
     this.inventarioService.registrarEntrada(form).subscribe({
       next: () => {
         this.loadInventario();
+        this.loadMovimientosHoy(); 
         this.mensajeEntradaError.set(null);
         this.cerrarEntrada();
       },

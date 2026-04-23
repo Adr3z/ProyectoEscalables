@@ -28,6 +28,7 @@ export class MovimientosLista implements OnInit, OnDestroy {
   modalEditarAbierto = signal(false);
   movimientoEditar = signal<Movimiento | null>(null);
   cantidadEditada = signal<number | null>(null);
+  mensajeEditarError = signal<string | null>(null);
 
   //Modal confirmar eliminar
   modalConfirmarAbierto = signal(false);
@@ -157,26 +158,44 @@ export class MovimientosLista implements OnInit, OnDestroy {
   abrirEditar(mov: Movimiento): void {
     this.movimientoEditar.set(mov);
     this.cantidadEditada.set(mov.cantidad);
+    this.mensajeEditarError.set(null);
     this.modalEditarAbierto.set(true);
   }
 
   cerrarEditar(): void {
     this.movimientoEditar.set(null);
     this.cantidadEditada.set(null);
+    this.mensajeEditarError.set(null);
     this.modalEditarAbierto.set(false);
   }
 
   guardarEdicion(): void {
     const editar = this.movimientoEditar();
     const cantidad = this.cantidadEditada();
-    if (editar && cantidad !== null) {
-      this.movimientos.set(this.movimientos().map(m =>
-        m._id === editar._id
-          ? { ...m, cantidad }
-          : m
-      ));
+    if (!editar || cantidad === null) {
+      return;
     }
-    this.cerrarEditar();
+
+    if (cantidad <= 0) {
+      this.mensajeEditarError.set('La cantidad debe ser mayor a cero.');
+      return;
+    }
+
+    this.movimientoService.updateMovimiento(editar._id, { cantidad }).subscribe({
+      next: (movimientoActualizado) => {
+        this.movimientos.set(this.movimientos().map(m =>
+          m._id === editar._id
+            ? { ...m, ...movimientoActualizado }
+            : m
+        ));
+        this.cerrarEditar();
+      },
+      error: (error) => {
+        const mensaje = error?.error?.message ?? 'No fue posible actualizar el movimiento.';
+        this.mensajeEditarError.set(mensaje);
+        console.error('Error al actualizar movimiento:', error);
+      }
+    });
   }
 
   //Eliminar
@@ -193,8 +212,15 @@ export class MovimientosLista implements OnInit, OnDestroy {
   eliminar(): void {
     const id = this.movimientoEliminarId();
     if (id) {
-      this.movimientos.set(this.movimientos().filter(m => m._id !== id));
+      this.movimientoService.deleteMovimiento(id).subscribe({
+        next: () => {
+          this.movimientos.set(this.movimientos().filter(m => m._id !== id));
+          this.cancelarEliminar();
+        },
+        error: (error) => {
+          console.error('Error al eliminar movimiento:', error);
+        }
+      });
     }
-    this.cancelarEliminar();
   }
 }
