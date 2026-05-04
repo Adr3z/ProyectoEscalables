@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Rol } from '../../../models';
 import { Router } from '@angular/router';
 import { Modal } from "../modal/modal";
+import { AuthService, User } from '../../../core/services/auth.service';
 
 interface NavItem {
   label: string;
@@ -20,11 +21,11 @@ interface NavItem {
   styleUrl: './sidebar.css'
 })
 
-export class Sidebar {
+export class Sidebar implements OnInit {
 
-  rolActual: Rol = 'Administrador';
+  usuario: User | null = null;
   modalCerrarSesionAbierto = false;
-  sidebarAbierto: boolean = false
+  sidebarAbierto: boolean = false;
 
   navItems: NavItem[] = [
     { label: 'Catálogo',   ruta: '/admin/catalogo',   icono: 'catalogo',   roles: ['Administrador'] },
@@ -35,18 +36,24 @@ export class Sidebar {
   ];
 
   get itemsVisibles(): NavItem[] {
-    return this.navItems.filter(item => item.roles.includes(this.rolActual));
+    if (!this.usuario) return [];
+    return this.navItems.filter(item => item.roles.includes(this.usuario!.rol as Rol));
   }
 
-  constructor(private router: Router) {}
+  get iniciales(): string {
+    if (!this.usuario) return 'U';
+    return this.usuario.nombre.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+  }
 
-  //Mock para alternar rol en desarrollo
-  toggleRol(): void {
-    this.rolActual = this.rolActual === 'Administrador' ? 'Empleado' : 'Administrador';
+  constructor(private router: Router, private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.usuario = this.authService.getUser();
   }
 
   confirmarCerrarSesion(): void {
     this.modalCerrarSesionAbierto = false;
+    this.authService.logout();
     this.router.navigate(['/']);
   }
 

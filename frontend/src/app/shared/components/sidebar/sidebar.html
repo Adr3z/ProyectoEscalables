@@ -36,7 +36,7 @@
         
         <div class="truncate">
             <p class="text-sm font-bold text-gray-900 leading-none">BakePOS</p>
-            <p class="text-xs text-gray-400 mt-0.5">{{ rolActual }}</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ usuario?.rol || 'Usuario' }}</p>
         </div>
 
         <button (click)="sidebarAbierto = false" 
@@ -100,26 +100,14 @@
         <!-- Info usuario -->
         <div class="flex items-center gap-3 px-3 py-2">
             <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-xs font-semibold shrink-0">
-                AB
+                {{ iniciales }}
             </div>
 
             <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-700 truncate leading-none">Ana Baker</p>
-                <p class="text-xs text-gray-400 mt-0.5 truncate">{{ rolActual }}</p>
+                <p class="text-sm font-medium text-gray-700 truncate leading-none">{{ usuario?.nombre || 'Usuario' }}</p>
+                <p class="text-xs text-gray-400 mt-0.5 truncate">{{ usuario?.rol || 'Sin rol' }}</p>
             </div>
         </div>
-
-        <!-- Toggle rol (solo desarrollo) -->
-        <button
-        (click)="toggleRol()"
-        class="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-400
-                hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-            </svg>
-            Cambiar a {{ rolActual === 'Administrador' ? 'Empleado' : 'Administrador' }}
-        </button>
 
         <!-- Cerrar sesión -->
         <button
