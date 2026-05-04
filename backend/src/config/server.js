@@ -16,6 +16,7 @@ class Server {
             ventas: '/api/ventas',
             usuarios: '/api/usuarios',
             movimientos: '/api/movimientos',
+            auth: '/api/auth'
         };
 
         this.conectarDB();
@@ -42,6 +43,8 @@ class Server {
         this.app.use(this.paths.inventario, require('../routes/inventario.routes'));
         this.app.use(this.paths.movimientos, require('../routes/movimientos.routes'));
         this.app.use(this.paths.ventas, require('../routes/venta.routes'));
+        this.app.use(this.paths.usuarios, require('../routes/usuarios.routes'));
+        this.app.use(this.paths.auth, require('../routes/auth.routes'));
     }
 
 

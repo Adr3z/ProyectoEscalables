@@ -36,6 +36,11 @@
 
     <!-- Tabla  -->
     <div class="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
+        @if (isLoading()) {
+            <div class="px-5 py-12 text-center text-sm text-gray-400">
+                Cargando usuarios...
+            </div>
+        } @else {
         <table class="w-full text-sm">
             <thead>
                 <tr class="border-b border-gray-100">
@@ -112,13 +117,19 @@
         </table>
 
         <div class="px-5 py-3 border-t border-gray-100">
-            <app-paginacion [total]="usuariosFiltrados.length" [porPagina]="porPagina"
-            [paginaActual]="paginaActual" (paginaCambia)="cambiarPagina($event)"/>
+            <app-paginacion [total]="usuariosFiltrados.length" [porPagina]="porPagina()" 
+            [paginaActual]="paginaActual()" (paginaCambia)="cambiarPagina($event)"/>
         </div>
+        }
     </div>
 
     <!-- Cards -->
     <div class="md:hidden bg-white rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-50">
+        @if (isLoading()) {
+            <div class="px-5 py-12 text-center text-sm text-gray-400">
+                Cargando usuarios...
+            </div>
+        } @else {
         @for (usuario of usuariosPaginados; track usuario._id) {
             <div class="px-4 py-3.5 flex items-center gap-3">
 
@@ -175,16 +186,17 @@
         }
 
         <div class="px-5 py-3">
-            <app-paginacion [total]="usuariosFiltrados.length" [porPagina]="porPagina"
-            [paginaActual]="paginaActual" (paginaCambia)="cambiarPagina($event)"/>
+            <app-paginacion [total]="usuariosFiltrados.length" [porPagina]="porPagina()"
+            [paginaActual]="paginaActual()" (paginaCambia)="cambiarPagina($event)"/>
         </div>
+        }
     </div>
 
 </div>
 
-<app-usuario-form [abierto]="modalAbierto" (cerrar)="cerrarModal()"/>
+<app-usuario-form [abierto]="modalAbierto()" (cerrar)="cerrarModal()" (usuarioCreado)="onUsuarioCreado()"/>
 
-<app-modal titulo="Eliminar usuario" [abierto]="modalConfirmarAbierto" (cerrar)="cancelarEliminar()">
+<app-modal titulo="Eliminar usuario" [abierto]="modalConfirmarAbierto()" (cerrar)="cancelarEliminar()">
     <div class="space-y-5">
         <div class="flex items-start gap-3">
             <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
