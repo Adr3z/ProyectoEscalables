@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { verifyToken, allowRoles } = require('../middlewares/auth.middleware');
 
 const {
     getProductos, 
@@ -12,10 +13,10 @@ const {
 const router = Router();
 
 router.get('/publicos', getProductosPublicos);
-router.get('/', getProductos);
-router.get('/:id', getProductoById);
-router.post('/', createProducto);
-router.put('/:id', updateProducto);
-router.delete('/:id', deleteProducto);
+router.get('/', verifyToken, allowRoles('Administrador', 'Empleado'), getProductos);
+router.get('/:id', verifyToken, allowRoles('Administrador', 'Empleado'), getProductoById);
+router.post('/', verifyToken, allowRoles('Administrador'), createProducto);
+router.put('/:id', verifyToken, allowRoles('Administrador'), updateProducto);
+router.delete('/:id', verifyToken, allowRoles('Administrador'), deleteProducto);
 
 module.exports = router;

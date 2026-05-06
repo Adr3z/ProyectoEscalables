@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { verifyToken, allowRoles } = require('../middlewares/auth.middleware');
 
 const {
     getVentas,
@@ -8,8 +9,8 @@ const {
 
 const router = Router();
 
-router.get('/',      getVentas);
-router.get('/:id',   getVentaById);
-router.post('/',     registrarVenta);
+router.get('/', verifyToken, allowRoles('Administrador'), getVentas);
+router.get('/:id', verifyToken, allowRoles('Administrador'), getVentaById);
+router.post('/', verifyToken, allowRoles('Administrador', 'Empleado'), registrarVenta);
 
 module.exports = router;

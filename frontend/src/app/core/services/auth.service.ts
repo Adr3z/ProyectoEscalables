@@ -13,6 +13,7 @@ export interface User {
     nombre: string;
     email: string;
     rol: string;
+    passwordTemporal?: boolean;
 }
 
 export interface LoginResponse {
@@ -56,9 +57,7 @@ export class AuthService {
         return userStr ? JSON.parse(userStr) : null;
     }
 
-    changePassword(data: { currentPassword: string; newPassword: string }): Observable<any> {
-        const token = this.getToken();
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    changePassword(data: { currentPassword?: string; newPassword: string }): Observable<any> {
         return this.http.put(`${this.apiUrl}/change-password`, data);
     }
 }

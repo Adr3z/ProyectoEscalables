@@ -50,7 +50,7 @@ export class CatalogoPublico implements OnInit {
   ngOnInit(): void {
     forkJoin([
       this.productoService.getProductosPublicos(),
-      this.categoriaService.getCategorias(),
+      this.categoriaService.getCategoriasPublicas(),
     ]).subscribe({
       next: ([productos, categorias]) => {
         this.productos = productos;

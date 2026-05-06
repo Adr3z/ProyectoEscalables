@@ -13,6 +13,11 @@ export class CategoriaService {
         return this.http.get<Categoria[]>(this.API);
     }
 
+    //Consulta pública de categorías
+    getCategoriasPublicas() {
+        return this.http.get<Categoria[]>(`${this.API}/publicas`);
+    }
+
     //Crear categoría
     createCategoria(data: Omit<Categoria, '_id'>) {
         return this.http.post<Categoria>(this.API, data);

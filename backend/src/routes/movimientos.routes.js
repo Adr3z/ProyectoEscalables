@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { verifyToken, allowRoles } = require('../middlewares/auth.middleware');
 
 const {
     getMovimientos,
@@ -8,8 +9,8 @@ const {
 
 const router = Router();
 
-router.get('/', getMovimientos);
-router.put('/:id', updateMovimiento);
-router.delete('/:id', deleteMovimiento);
+router.get('/', verifyToken, allowRoles('Administrador'), getMovimientos);
+router.put('/:id', verifyToken, allowRoles('Administrador'), updateMovimiento);
+router.delete('/:id', verifyToken, allowRoles('Administrador'), deleteMovimiento);
 
 module.exports = router;

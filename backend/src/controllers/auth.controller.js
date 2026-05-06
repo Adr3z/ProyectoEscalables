@@ -24,7 +24,8 @@ const login = async (req, res) => {
                 id: user._id,
                 nombre: user.nombre,
                 email: user.email,
-                rol: user.rol
+                rol: user.rol,
+                passwordTemporal: user.passwordTemporal
             }
         });
     } catch (error) {
@@ -42,13 +43,20 @@ const changePassword = async (req, res) => {
             return res.status(404).json({ msg: 'Usuario no encontrado' });
         }
 
-        const validPassword = await bcrypt.compare(currentPassword, user.password);
-        if (!validPassword) {
-            return res.status(400).json({ msg: 'Contraseña actual incorrecta' });
+        if (!user.passwordTemporal) {
+            if (!currentPassword) {
+                return res.status(400).json({ msg: 'La contraseña actual es obligatoria' });
+            }
+
+            const validPassword = await bcrypt.compare(currentPassword, user.password);
+            if (!validPassword) {
+                return res.status(400).json({ msg: 'Contraseña actual incorrecta' });
+            }
         }
 
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(newPassword, salt);
+        user.passwordTemporal = false;
         await user.save();
 
         res.json({ msg: 'Contraseña cambiada exitosamente' });

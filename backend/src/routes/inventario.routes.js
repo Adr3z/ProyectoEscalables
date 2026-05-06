@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { verifyToken, allowRoles } = require('../middlewares/auth.middleware');
 
 const {
     getInventario,
@@ -10,10 +11,10 @@ const {
 
 const router = Router();
 
-router.get('/', getInventario);
-router.get('/:id', getInventarioById);
-router.post('/entrada', registrarEntrada);
-router.post('/salida', registrarSalida);
-router.put('/:id', actualizarInventario);
+router.get('/', verifyToken, allowRoles('Administrador', 'Empleado'), getInventario);
+router.get('/:id', verifyToken, allowRoles('Administrador', 'Empleado'), getInventarioById);
+router.post('/entrada', verifyToken, allowRoles('Administrador'), registrarEntrada);
+router.post('/salida', verifyToken, allowRoles('Administrador'), registrarSalida);
+router.put('/:id', verifyToken, allowRoles('Administrador'), actualizarInventario);
 
 module.exports = router;
