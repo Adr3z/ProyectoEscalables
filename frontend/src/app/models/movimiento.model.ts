@@ -13,6 +13,7 @@ export interface Movimiento {
     tipo: TipoMovimiento;
     productoId: string | MovimientoProducto;
     producto?: Producto | MovimientoProducto;
+    nombreProducto?: string; // Campo adicional para mostrar el nombre directamente
     cantidad: number;
     fecha: Date;
     usuarioId?: string;

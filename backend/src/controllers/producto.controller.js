@@ -5,11 +5,14 @@ const Inventario = require('../models/inventario.model');
 //Obtener todos los productos
 const getProductos = async( req, res) => {
     try {
-        const productos = await Producto.find().populate('categoriaId', 'nombre padreId');
+        const productos = await Producto.find()
+            .populate('categoriaId', 'nombre padreId')
+            .then(docs => docs.filter(doc => doc.categoriaId)); // Filtrar productos sin categoría
         res.status(200).json(productos);
     }catch (error) {
+        console.error('Error en getProductos:', error);
         res.status(500).json({
-            message: 'Error al obtener los productos', error
+            message: 'Error al obtener los productos', error: error.message
         });
     }
 };
@@ -25,10 +28,16 @@ const getProductoById = async (req, res) => {
                 message: 'Producto no encontrado'
             });
         }
+        if(!producto.categoriaId) {
+            return res.status(404).json({
+                message: 'Producto sin categoría válida'
+            });
+        }
         res.status(200).json(producto);
     }catch (error) {
+        console.error('Error en getProductoById:', error);
         res.status(500).json({
-            message: 'Error al encontrar el producto', error
+            message: 'Error al encontrar el producto', error: error.message
         });
     }
 };
@@ -40,11 +49,13 @@ const getProductosPublicos = async( req, res) => {
     try {
         const productos = await Producto.find({ stockActual: { $gt: 0} })
           .populate('categoriaId', 'nombre padreId descripcion')
-          .select('nombre descripcion precio categoriaId stockActual');
+          .select('nombre descripcion precio categoriaId stockActual')
+          .then(docs => docs.filter(doc => doc.categoriaId)); // Filtrar productos sin categoría
         res.status(200).json(productos);
     }catch (error) {
+        console.error('Error en getProductosPublicos:', error);
         res.status(500).json({
-            message: 'Error al obtener los productos', error
+            message: 'Error al obtener los productos', error: error.message
         })
     }
 }

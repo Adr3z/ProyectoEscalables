@@ -10,6 +10,7 @@ const MovimientoSchema = new Schema({
         },
         required: [true, 'El tipo de movimiento es obligatorio'],
     },
+    nombreProducto: { type: String, required: true },
 
     productoId: {
         type: Schema.Types.ObjectId,

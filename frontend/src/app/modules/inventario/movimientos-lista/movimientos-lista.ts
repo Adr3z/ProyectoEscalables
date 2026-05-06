@@ -135,6 +135,10 @@ export class MovimientosLista implements OnInit, OnDestroy {
   cambiarPagina(pagina: number): void { this.paginaActual.set(pagina); }
 
   getNombreProducto(mov: Movimiento): string {
+    if (mov.nombreProducto) {
+      return mov.nombreProducto;
+    }
+
     if (mov.producto?.nombre) {
       return mov.producto.nombre;
     }

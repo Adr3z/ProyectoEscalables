@@ -28,23 +28,26 @@ const getInventario = async (req, res) => {
         });
 
         //Adjuntar el estado calculado a cada registro
-        const resultado = inventario.map((item) => {
-            const objeto = item.toObject();
-            return {
-                ...objeto,
-                producto: objeto.productoId,
-                estado: calcularEstado(
-                    objeto.productoId.stockActual,
-                    objeto.stockMinimo,
-                    objeto.stockMaximo
-                ),
-            };
-        });
+        const resultado = inventario
+            .filter(item => item.productoId) // Filtrar items donde productoId existe
+            .map((item) => {
+                const objeto = item.toObject();
+                return {
+                    ...objeto,
+                    producto: objeto.productoId,
+                    estado: calcularEstado(
+                        objeto.productoId.stockActual,
+                        objeto.stockMinimo,
+                        objeto.stockMaximo
+                    ),
+                };
+            });
 
         res.status(200).json(resultado);
     }catch (error) {
+        console.error('Error en getInventario:', error);
         res.status(500).json({
-            message: 'Error al obtener el inventario', error
+            message: 'Error al obtener el inventario', error: error.message
         });
     }
 };
@@ -126,6 +129,7 @@ const registrarEntrada = async (req, res) => {
         const movimiento = await new Movimiento({
             tipo: 'ENTRADA',
             productoId,
+            nombreProducto: producto.nombre,
             cantidad,
             usuarioId,
             notas
@@ -185,6 +189,7 @@ const registrarSalida = async (req, res) => {
         const movimiento = await new Movimiento({
             tipo: 'SALIDA',
             productoId,
+            nombreProducto: producto.nombre,
             cantidad,
             usuarioId,
             notas
