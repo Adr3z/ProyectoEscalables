@@ -48,8 +48,13 @@ export class Login {
       next: (response) => {
         this.isLoading.set(false);
         this.hasRecentError.set(false);
-        // Redireccionar según el rol del usuario
         const user = response.user;
+
+        if (user.passwordTemporal) {
+          this.router.navigate(['/change-password']);
+          return;
+        }
+
         if (user.rol === 'Administrador') {
           this.router.navigate(['/admin/catalogo']);
         } else {

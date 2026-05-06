@@ -18,7 +18,7 @@ export const routes: Routes = [
         ]
     },
 
-    // Rutas admin
+    // Rutas admin (protegidas)
     {
         path: 'admin',
         component: AdminLayout,
@@ -73,6 +73,12 @@ export const routes: Routes = [
             .then(m => m.Login)
     },
 
+    {
+        path: 'change-password',
+        loadComponent: () =>
+        import('./modules/auth/change-password/change-password')
+            .then(m => m.ChangePasswordComponent)
+    },
     // Fallback
     {
         path: '**',
