@@ -1,5 +1,6 @@
 const Venta = require('../models/venta.model');
 const Producto = require('../models/producto.model');
+const Usuario = require('../models/usuario.model');
 const Movimiento = require('../models/movimiento.model');
 
 
@@ -49,12 +50,20 @@ const getVentaById = async (req, res) => {
 //Registrar una venta
 const registrarVenta = async (req, res) => {
     try {
-        const { usuarioId, detalles } = req.body;
-        //detalles { productoId, cantidad }
+        const { detalles } = req.body;
+        const usuarioId = req.user.id; // Usar usuario del token
 
         if(!detalles || detalles.length === 0) {
             return res.status(400).json({
                 message: 'La venta debe contener al menos un producto'
+            });
+        }
+
+        // Validar que el usuario existe
+        const usuario = await Usuario.findById(usuarioId);
+        if(!usuario) {
+            return res.status(401).json({
+                message: 'Usuario no válido'
             });
         }
 
@@ -83,6 +92,7 @@ const registrarVenta = async (req, res) => {
 
             detallesVenta.push({
                 productoId: producto._id,
+                nombreProducto: producto.nombre,
                 cantidad: detalle.cantidad,
                 precioUnitario,
             });
@@ -93,6 +103,7 @@ const registrarVenta = async (req, res) => {
             await new Movimiento({
                 tipo: 'SALIDA',
                 productoId: producto._id,
+                nombreProducto: producto.nombre,
                 cantidad: detalle.cantidad,
                 usuarioId,
             }).save();
@@ -106,8 +117,9 @@ const registrarVenta = async (req, res) => {
 
         res.status(201).json(venta);
     } catch (error) {
+        console.error('Error en registrarVenta:', error);
         res.status(500).json({
-            message: 'Error al registrar la venta', error
+            message: 'Error al registrar la venta', error: error.message
         });
     }
 };

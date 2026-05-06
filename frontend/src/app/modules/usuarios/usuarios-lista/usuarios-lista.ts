@@ -4,6 +4,9 @@ import { Paginacion, Modal } from '../../../shared/components';
 import { UsuarioForm } from '../usuario-form/usuario-form';
 import { Usuario } from '../../../models';
 import { UsuarioService } from '../../../core/services';
+import { AuthService } from '../../../core/services/auth.service';
+import { User } from '../../../core/services/auth.service';
+
 
 //busqueda
 import { Subscription } from 'rxjs';
@@ -33,9 +36,13 @@ export class UsuariosLista implements OnInit, OnDestroy {
   terminoBusqueda = signal('');
   private sub!: Subscription;
 
-  constructor(private busquedaService: BusquedaService, private usuarioService: UsuarioService) {}
+  constructor(private busquedaService: BusquedaService, private usuarioService: UsuarioService, private authService: AuthService ) {}
+
+  usuarioActual = signal<User | null>(null);
 
   ngOnInit(): void {
+    this.usuarioActual.set(this.authService.getUser());
+
     this.loadUsuarios();
     this.sub = this.busquedaService.termino$.subscribe(t => {
       this.terminoBusqueda.set(t);
@@ -57,6 +64,10 @@ export class UsuariosLista implements OnInit, OnDestroy {
         this.isLoading.set(false);
       }
     });
+  }
+
+  esUsuarioActual(usuario: Usuario): boolean {
+    return this.usuarioActual()?.id === usuario._id;
   }
 
   // Getters que acceden a las señales

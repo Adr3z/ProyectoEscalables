@@ -8,6 +8,11 @@ const DetalleVentaSchema = new Schema({
         required: true,
     },
 
+    nombreProducto: { 
+        type: String,
+        required: true,
+    },
+
     cantidad: {
         type: Number, 
         required: true,

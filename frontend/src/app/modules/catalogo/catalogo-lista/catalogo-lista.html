@@ -93,20 +93,13 @@
                         [class.text-gray-500]="!estaActiva(cat._id)" [class.hover:bg-gray-100]="!estaActiva(cat._id)">
 
                         {{ cat.nombre }}
-
-                        @if (cat._id === 'c1') {
-                            <svg class="w-3 h-3 transition-transform" [class.rotate-180]="mostrarSubcategorias()"
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        }
                         </button>
                     }
                 </div>
                 
                 @if (mostrarSubcategorias()) {
                     <div class="flex items-center gap-2 flex-wrap pl-4 border-l-2 border-red-200">
-                        @for (sub of subcategoriasPasteles(); track sub._id) {
+                        @for (sub of subcategoriasPasteles().filter(s => s.padreId === categoriaActivaId()); track sub._id) {
                             <button (click)="seleccionarSubcategoria(sub)"
                                 class="px-3 py-1 rounded-full text-xs font-medium border transition-colors"
                                 [class.bg-red-100]="estaActiva(sub._id)" [class.text-red-700]="estaActiva(sub._id)"

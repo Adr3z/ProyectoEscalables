@@ -40,6 +40,19 @@ export class UsuarioForm implements OnChanges {
     this.form.rol = rol;
   }
 
+  get formularioValido(): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    return (
+      !!this.form.nombre?.trim() &&
+      !!this.form.email?.trim() &&
+      emailRegex.test(this.form.email) &&
+      !!this.form.password?.trim() &&
+      this.form.password.length >= 6 &&
+      (this.form.rol === 'Administrador' || this.form.rol === 'Empleado')
+    );
+  }
+
   guardar(): void {
     // Reset error message
     this.errorMessage = '';

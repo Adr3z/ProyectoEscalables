@@ -23,6 +23,8 @@ export class CatalogoForm implements OnChanges {
   categoriasPrincipales: Categoria[] = [];
   subcategorias: Categoria[] = [];
 
+  mensajeError = '';
+
   form: {
     nombre:       string;
     precio:       number | null;
@@ -35,6 +37,17 @@ export class CatalogoForm implements OnChanges {
     stockMinimo: null, stockMaximo: null
   };
 
+  get formularioValido(): boolean {
+    return !!(
+      this.form.nombre.trim() &&
+      this.form.precio !== null &&
+      this.form.precio > 0 &&
+      this.form.categoriaId &&
+      this.form.stockMinimo !== null &&
+      this.form.stockMaximo !== null &&
+      this.form.stockMinimo <= this.form.stockMaximo
+    );
+  }
 
   get titulo(): string { return this.producto ? 'Editar producto' : 'Crear nuevo producto'; }
   get esEdicion(): boolean { return !!this.producto; }
@@ -107,6 +120,34 @@ export class CatalogoForm implements OnChanges {
   }
 
   guardar(): void {
+
+    this.mensajeError = '';
+
+    if (!this.form.nombre.trim()) {
+      this.mensajeError = 'El nombre es obligatorio';
+      return;
+    }
+
+    if (this.form.precio === null || this.form.precio <= 0) {
+      this.mensajeError = 'El precio debe ser mayor a 0';
+      return;
+    }
+
+    if (!this.form.categoriaId) {
+      this.mensajeError = 'Debes seleccionar una categoría';
+      return;
+    }
+
+    if (this.form.stockMinimo === null || this.form.stockMaximo === null) {
+      this.mensajeError = 'Debes completar el stock mínimo y máximo';
+      return;
+    }
+
+    if (this.form.stockMinimo > this.form.stockMaximo) {
+      this.mensajeError = 'El stock mínimo no puede ser mayor al máximo';
+      return;
+    }
+
     const payload = {
       nombre: this.form.nombre.trim(),
       precio: this.form.precio ?? 0,

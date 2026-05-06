@@ -29,6 +29,10 @@ export class CategoriaForm implements OnChanges {
   // ── Formulario ────────────────────────────────────────────────────────────
   form: CategoriaFormModel = { nombre: '', descripcion: '', padreId: '' };
 
+  get formularioValido(): boolean {
+    return !!this.form.nombre.trim();
+  }
+
   get titulo(): string     { return this.categoria ? 'Editar categoría' : 'Nueva categoría'; }
   get esEdicion(): boolean { return !!this.categoria; }
 
@@ -66,8 +70,8 @@ export class CategoriaForm implements OnChanges {
 
     const padreId = this.form.padreId?.trim();
     const payload: CategoriaFormModel = {
-      nombre:      this.form.nombre.trim(),
-      descripcion: this.form.descripcion?.trim() || undefined,
+      nombre: this.form.nombre.trim(),
+      ...(this.form.descripcion?.trim() ? { descripcion: this.form.descripcion.trim() } : {}),
       ...(padreId ? { padreId } : {}),
     };
 

@@ -52,6 +52,13 @@ export class EntradaForm implements OnChanges {
     }
   }
 
+  get formularioValido(): boolean {
+    return !!(
+      this.form.productoId &&
+      this.form.cantidad > 0
+    );
+  }
+
   guardarModal(): void {
     if (!this.form.productoId || !(this.form.cantidad > 0)) {
       this.errorMessage = 'Debes seleccionar un producto y una cantidad válida antes de guardar.';

@@ -166,9 +166,10 @@
 
             <button
                 (click)="guardar()"
-                [disabled]="isLoading"
+                [disabled]="isLoading || !formularioValido"
                 class="px-4 py-2.5 text-sm font-semibold text-white bg-red-500
-                    hover:bg-red-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    hover:bg-red-600 rounded-lg transition-colors
+                    disabled:opacity-50 disabled:cursor-not-allowed">
                 {{ isLoading ? 'Creando...' : 'Crear Empleado' }}
             </button>
         </div>

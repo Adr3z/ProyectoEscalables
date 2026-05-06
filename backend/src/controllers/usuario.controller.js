@@ -113,9 +113,10 @@ const deleteUsuario = async (req, res) =>{
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
-        res.status(200).json( {message: 'Error al desactivar el usuario', error});
+        res.status(200).json( {message: 'Usuario eliminado correctamente'});
     } catch (error) {
-        res.status(500).json({ message: 'Error al desactivar el usuario', error });
+        console.error(error);
+    res.status(500).json({ message: error.message });
     }
 };
 

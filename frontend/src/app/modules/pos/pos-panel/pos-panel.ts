@@ -269,6 +269,7 @@ export class PosPanel implements OnInit, OnDestroy {
     confirmarVenta(): void {
         const detalles: DetalleVentaForm[] = this.carrito().map(item => ({
         productoId: item.producto._id,
+        nombreProducto: item.producto.nombre,
         cantidad: item.cantidad,
         precioUnitario: item.producto.precio,
         }));
@@ -279,7 +280,6 @@ export class PosPanel implements OnInit, OnDestroy {
         }
 
         this.ventaService.registrarVenta({
-        usuarioId: '000000000000000000000000',
         detalles,
         }).subscribe({
         next: () => {

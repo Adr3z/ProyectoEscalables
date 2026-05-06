@@ -23,6 +23,7 @@ export interface VentaForm {
 
 export interface DetalleVentaForm {
     productoId: string;
+    nombreProducto: string;
     cantidad: number;
     precioUnitario: number;
 }

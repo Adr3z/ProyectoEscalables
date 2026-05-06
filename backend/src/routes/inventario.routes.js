@@ -13,8 +13,8 @@ const router = Router();
 
 router.get('/', verifyToken, allowRoles('Administrador', 'Empleado'), getInventario);
 router.get('/:id', verifyToken, allowRoles('Administrador', 'Empleado'), getInventarioById);
-router.post('/entrada', verifyToken, allowRoles('Administrador'), registrarEntrada);
-router.post('/salida', verifyToken, allowRoles('Administrador'), registrarSalida);
+router.post('/entrada', verifyToken, allowRoles('Administrador', 'Empleado'), registrarEntrada);
+router.post('/salida', verifyToken, allowRoles('Administrador', 'Empleado'), registrarSalida);
 router.put('/:id', verifyToken, allowRoles('Administrador'), actualizarInventario);
 
 module.exports = router;

@@ -9,7 +9,7 @@ const {
 
 const router = Router();
 
-router.get('/', verifyToken, allowRoles('Administrador'), getMovimientos);
+router.get('/', verifyToken, allowRoles('Administrador', 'Empleado'), getMovimientos);
 router.put('/:id', verifyToken, allowRoles('Administrador'), updateMovimiento);
 router.delete('/:id', verifyToken, allowRoles('Administrador'), deleteMovimiento);
 

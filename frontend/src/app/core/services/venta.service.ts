@@ -3,8 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../env';
 import { Venta, VentaForm } from '../../models';
 
-type VentaRequest = VentaForm & { usuarioId: string };
-
 @Injectable({ providedIn: 'root' })
 export class VentaService {
     private http = inject(HttpClient);
@@ -18,7 +16,7 @@ export class VentaService {
         return this.http.get<Venta>(`${this.API}/${id}`);
     }
 
-    registrarVenta(form: VentaRequest) {
+    registrarVenta(form: VentaForm) {
         return this.http.post<Venta>(this.API, form);
     }
 }

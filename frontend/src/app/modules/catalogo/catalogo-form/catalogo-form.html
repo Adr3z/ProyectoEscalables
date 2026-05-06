@@ -130,6 +130,11 @@
                     focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent">
             </textarea>
         </div>
+            @if (!formularioValido) {
+            <p class="text-xs text-gray-400">
+                Completa todos los campos correctamente para continuar.
+            </p>
+            }
 
         <!-- Acciones -->
         <div class="flex items-center justify-end gap-3 pt-2">
@@ -142,8 +147,10 @@
 
             <button
                 (click)="guardar()"
-                class="px-4 py-2.5 text-sm font-semibold text-white bg-red-500
-                    hover:bg-red-600 rounded-lg transition-colors" >
+                [disabled]="!formularioValido"
+                class="px-4 py-2.5 text-sm font-semibold text-white rounded-lg transition-colors
+                    bg-red-500 hover:bg-red-600
+                    disabled:bg-gray-300 disabled:cursor-not-allowed">
                 {{ esEdicion ? 'Guardar cambios' : 'Guardar producto' }}
             </button>
         </div>

@@ -92,8 +92,10 @@
 
             <button
                 (click)="guardarModal()"
-                class="px-4 py-2.5 text-sm font-semibold text-white bg-red-500
-                    hover:bg-red-600 rounded-lg transition-colors" >
+                [disabled]="!formularioValido"
+                class="px-4 py-2.5 text-sm font-semibold text-white rounded-lg transition-colors
+                    bg-red-500 hover:bg-red-600
+                    disabled:bg-gray-300 disabled:cursor-not-allowed">
                 Guardar Stock
             </button>
         </div>
